@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="ClinicalEDGE">
 <meta name="theme-color" content="#0a0f1e">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>ClinicalEDGE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
@@ -165,17 +166,13 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-sub{font-size:13px;color:var(--muted)}
 
-/* Question box */
 .question-box{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.4);border-left:3px solid #9d5cf6;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;font-size:14px;color:var(--white2);line-height:1.65;font-style:italic}
-.question-label{font-size:10px;font-weight:600;color:var(--purple3);letter-spacing:1px;margin-bottom:6px;font-style:normal}
-
-/* Fullscreen image viewer */
-#img-viewer{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;flex-direction:column}
-#img-viewer.open{display:flex}
-#img-viewer img{max-width:100%;max-height:90vh;object-fit:contain;touch-action:pinch-zoom}
-#img-viewer-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:24px;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.question-label{font-size:10px;font-weight:600;color:var(--purple3);letter-spacing:1px;margin-bottom:6px;font-style:normal;display:block}
+#img-viewer{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.96);touch-action:none}
+#img-viewer.open{display:flex;align-items:center;justify-content:center}
+#img-viewer-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;font-family:sans-serif;line-height:1}
+#img-viewer-img{max-width:100%;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;user-select:none;-webkit-user-select:none}
 .content-img-wrap img{cursor:zoom-in}
-
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
@@ -194,11 +191,6 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="splash-content">
-    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 14px">
-  <polygon points="28,3 50,15 50,41 28,53 6,41 6,15" fill="#1a0040" stroke="#7c3aed" stroke-width="2"/>
-  <polygon points="28,9 46,19 46,37 28,47 10,37 10,19" fill="none" stroke="#9d5cf6" stroke-width="1" opacity="0.5"/>
-  <text x="28" y="34" font-family="DM Sans,sans-serif" font-size="15" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text>
-</svg>
     <div class="splash-logo">Clinical<span>EDGE</span></div>
     <div class="splash-org">
       Academic Division of St Vincent Hospital<br>IM Residency Program
@@ -222,10 +214,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 2: REGISTER ══ -->
 <div class="screen" id="screen-register">
   <div class="reg-top">
-    <div class="reg-logo"><svg width="30" height="30" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:8px;margin-bottom:3px">
-  <polygon points="28,3 50,15 50,41 28,53 6,41 6,15" fill="#1a0040" stroke="#7c3aed" stroke-width="3"/>
-  <text x="28" y="35" font-family="DM Sans,sans-serif" font-size="18" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text>
-</svg>Clinical<span>EDGE</span></div>
+    <div class="reg-logo">Clinical<span>EDGE</span></div>
     <div class="reg-org">Academic Division of St Vincent Hospital<br>IM Residency Program</div>
   </div>
   <div class="reg-card">
@@ -242,10 +231,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 3: HOME ══ -->
 <div class="screen" id="screen-home">
   <div class="topbar">
-    <div class="topbar-logo"><svg width="22" height="22" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:7px;margin-bottom:2px">
-  <polygon points="28,3 50,15 50,41 28,53 6,41 6,15" fill="#1a0040" stroke="#7c3aed" stroke-width="3"/>
-  <text x="28" y="35" font-family="DM Sans,sans-serif" font-size="18" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text>
-</svg>Clinical<span>EDGE</span></div>
+    <div class="topbar-logo">Clinical<span>EDGE</span></div>
   </div>
   <div class="home-body">
     <div class="search-wrap">
@@ -281,7 +267,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   </div>
   <div class="content-body">
     <div class="content-title-h" id="content-title"></div>
-    <div id="question-box" class="question-box" style="display:none"><div class="question-label">CLINICAL QUESTION</div><div id="question-text"></div></div>
+    <div id="question-box" style="display:none" class="question-box"><span class="question-label">CLINICAL QUESTION</span><span id="question-text"></span></div>
     <div class="content-img-wrap" id="content-img-wrap"></div>
     <button class="btn-explain" id="explain-btn" onclick="toggleExplanation()">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1 1 0 20A10 10 0 0 1 12 2z"/></svg>
@@ -294,10 +280,8 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   </div>
 </div>
 
-
-<!-- FULLSCREEN IMAGE VIEWER -->
-<div id="img-viewer" onclick="closeViewer(event)">
-  <button id="img-viewer-close" onclick="document.getElementById('img-viewer').classList.remove('open')">&#x2715;</button>
+<div id="img-viewer">
+  <button id="img-viewer-close" onclick="closeViewer()">&#x2715;</button>
   <img id="img-viewer-img" src="" alt="">
 </div>
 
@@ -316,7 +300,6 @@ let explanationVisible = false;
 
 // ── BOOT ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  // Show splash immediately — never block on network
   showScreen('screen-splash');
   hideLoading();
   const user = getUser();
@@ -326,16 +309,17 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('splash-name').textContent = user.first;
     loadAllContent().catch(() => {});
   }
-  // Handle device back button
-  window.addEventListener('popstate', () => {
-    const active = document.querySelector('.screen.active');
-    if (active && active.id !== 'screen-splash') {
-      if (active.id === 'screen-content') goBackFromContent();
-      else if (active.id === 'screen-category') showScreen('screen-home');
-      else if (active.id === 'screen-home') showScreen('screen-splash');
-      else showScreen('screen-splash');
-    }
-  });
+});
+
+// Device back button — listen for popstate
+window.addEventListener('popstate', () => {
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  const id = active.id;
+  if (id === 'screen-content') goBackFromContent();
+  else if (id === 'screen-category') showScreen('screen-home');
+  else if (id === 'screen-register') showScreen('screen-splash');
+  else if (id === 'screen-home') showScreen('screen-splash');
 });
 
 // ── SPLASH ───────────────────────────────────
@@ -580,8 +564,7 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
-  // Push state so device back button works
-  if (history.state !== id) history.pushState(id, '', '');
+  history.pushState({screen: id}, '', '');
 }
 
 // ── LOADING ──────────────────────────────────
@@ -590,22 +573,87 @@ function hideLoading() {
   ol.style.opacity = '0';
   setTimeout(() => ol.classList.add('hidden'), 400);
 }
-// ── IMAGE FULLSCREEN VIEWER ──────────────────
+// ── FULLSCREEN IMAGE VIEWER with pinch-zoom ──
+let _viewerScale = 1, _viewerLastDist = 0, _viewerStartScale = 1;
+let _dragX = 0, _dragY = 0, _lastX = 0, _lastY = 0, _isDragging = false;
+
 function openViewer(src) {
-  document.getElementById('img-viewer-img').src = src;
-  document.getElementById('img-viewer').classList.add('open');
-}
-function closeViewer(e) {
-  if (e.target === document.getElementById('img-viewer')) {
-    document.getElementById('img-viewer').classList.remove('open');
-  }
+  const img = document.getElementById('img-viewer-img');
+  const viewer = document.getElementById('img-viewer');
+  img.src = src;
+  _viewerScale = 1; _dragX = 0; _dragY = 0;
+  img.style.transform = 'translate(0px,0px) scale(1)';
+  viewer.classList.add('open');
 }
 
-// ── SERVICE WORKER ───────────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+function closeViewer() {
+  document.getElementById('img-viewer').classList.remove('open');
+}
+
+(function() {
+  const viewer = document.getElementById('img-viewer');
+  const img    = document.getElementById('img-viewer-img');
+
+  function updateTransform() {
+    img.style.transform = `translate(${_dragX}px,${_dragY}px) scale(${_viewerScale})`;
+  }
+
+  // Tap background to close
+  viewer.addEventListener('click', (e) => {
+    if (e.target === viewer) closeViewer();
   });
+
+  // Touch events for pinch-zoom and drag
+  viewer.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      _viewerLastDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      _viewerStartScale = _viewerScale;
+      e.preventDefault();
+    } else if (e.touches.length === 1) {
+      _isDragging = true;
+      _lastX = e.touches[0].clientX;
+      _lastY = e.touches[0].clientY;
+    }
+  }, {passive: false});
+
+  viewer.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      _viewerScale = Math.min(5, Math.max(1, _viewerStartScale * (dist / _viewerLastDist)));
+      updateTransform();
+    } else if (e.touches.length === 1 && _isDragging && _viewerScale > 1) {
+      e.preventDefault();
+      _dragX += e.touches[0].clientX - _lastX;
+      _dragY += e.touches[0].clientY - _lastY;
+      _lastX = e.touches[0].clientX;
+      _lastY = e.touches[0].clientY;
+      updateTransform();
+    }
+  }, {passive: false});
+
+  viewer.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) _isDragging = false;
+    if (_viewerScale < 1.05) { _viewerScale = 1; _dragX = 0; _dragY = 0; updateTransform(); }
+  });
+
+  // Mouse wheel zoom for desktop
+  viewer.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    _viewerScale = Math.min(5, Math.max(1, _viewerScale - e.deltaY * 0.002));
+    updateTransform();
+  }, {passive: false});
+})();
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 </script>
 </body>
