@@ -1,21 +1,27 @@
 const CACHE = 'clinicaledge-v1';
-const ASSETS = ['./'];
+const ASSETS = [
+  '/clinicaledge/',
+  '/clinicaledge/index.html',
+];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS))
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.url.includes('google')) return; // always fetch sheets live
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./')))
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });
