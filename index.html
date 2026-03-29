@@ -39,8 +39,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .orb1{width:360px;height:360px;background:rgba(124,58,237,0.3);top:-100px;right:-100px}
 .orb2{width:240px;height:240px;background:rgba(157,92,246,0.2);bottom:-60px;left:-80px}
 .splash-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
-.splash-logo-wrap{animation:floatUp 0.6s ease both;margin-bottom:14px}
-.splash-logo{font-size:40px;font-weight:600;letter-spacing:-1.5px;color:var(--white);line-height:1;animation:floatUp 0.6s 0.05s ease both}
+.splash-logo{font-size:46px;font-weight:600;letter-spacing:-1.5px;color:var(--white);line-height:1;animation:floatUp 0.6s ease both}
 .splash-logo span{color:var(--purple3)}
 .splash-org{margin-top:12px;font-size:12px;font-weight:400;color:var(--white3);letter-spacing:0.5px;line-height:1.7;animation:floatUp 0.6s 0.1s ease both}
 .splash-line{width:48px;height:1px;background:var(--border2);margin:32px auto;animation:floatUp 0.6s 0.2s ease both}
@@ -165,6 +164,18 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .loading-spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--purple2);border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-sub{font-size:13px;color:var(--muted)}
+
+/* Question box */
+.question-box{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.4);border-left:3px solid #9d5cf6;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;font-size:14px;color:var(--white2);line-height:1.65;font-style:italic}
+.question-label{font-size:10px;font-weight:600;color:var(--purple3);letter-spacing:1px;margin-bottom:6px;font-style:normal}
+
+/* Fullscreen image viewer */
+#img-viewer{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;flex-direction:column}
+#img-viewer.open{display:flex}
+#img-viewer img{max-width:100%;max-height:90vh;object-fit:contain;touch-action:pinch-zoom}
+#img-viewer-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:24px;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.content-img-wrap img{cursor:zoom-in}
+
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
@@ -183,7 +194,12 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="splash-content">
-    <div class="splash-logo-wrap"><svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="26,4 44,14 44,38 26,48 8,38 8,14" fill="rgba(124,58,237,0.18)" stroke="#7c3aed" stroke-width="1.5"/><polygon points="26,10 40,18 40,34 26,42 12,34 12,18" fill="rgba(124,58,237,0.08)" stroke="#9d5cf6" stroke-width="0.5"/><text x="26" y="31" font-family="DM Sans,sans-serif" font-size="13" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text></svg></div><div class="splash-logo">Clinical<span>EDGE</span></div>
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 14px">
+  <polygon points="28,3 50,15 50,41 28,53 6,41 6,15" fill="#1a0040" stroke="#7c3aed" stroke-width="2"/>
+  <polygon points="28,9 46,19 46,37 28,47 10,37 10,19" fill="none" stroke="#9d5cf6" stroke-width="1" opacity="0.5"/>
+  <text x="28" y="34" font-family="DM Sans,sans-serif" font-size="15" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text>
+</svg>
+    <div class="splash-logo">Clinical<span>EDGE</span></div>
     <div class="splash-org">
       Academic Division of St Vincent Hospital<br>IM Residency Program
     </div>
@@ -206,7 +222,10 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 2: REGISTER ══ -->
 <div class="screen" id="screen-register">
   <div class="reg-top">
-    <div class="reg-logo"><svg width="28" height="28" viewBox="0 0 52 52" fill="none" style="vertical-align:middle;margin-right:8px;margin-bottom:3px"><polygon points="26,4 44,14 44,38 26,48 8,38 8,14" fill="rgba(124,58,237,0.25)" stroke="#9d5cf6" stroke-width="2"/><text x="26" y="32" font-family="DM Sans,sans-serif" font-size="16" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text></svg>Clinical<span>EDGE</span></div>
+    <div class="reg-logo"><svg width="30" height="30" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:8px;margin-bottom:3px">
+  <polygon points="28,3 50,15 50,41 28,53 6,41 6,15" fill="#1a0040" stroke="#7c3aed" stroke-width="3"/>
+  <text x="28" y="35" font-family="DM Sans,sans-serif" font-size="18" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text>
+</svg>Clinical<span>EDGE</span></div>
     <div class="reg-org">Academic Division of St Vincent Hospital<br>IM Residency Program</div>
   </div>
   <div class="reg-card">
@@ -223,7 +242,10 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 3: HOME ══ -->
 <div class="screen" id="screen-home">
   <div class="topbar">
-    <div class="topbar-logo"><svg width="20" height="20" viewBox="0 0 52 52" fill="none" style="vertical-align:middle;margin-right:6px;margin-bottom:2px"><polygon points="26,4 44,14 44,38 26,48 8,38 8,14" fill="rgba(124,58,237,0.25)" stroke="#9d5cf6" stroke-width="2"/><text x="26" y="32" font-family="DM Sans,sans-serif" font-size="16" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text></svg>Clinical<span>EDGE</span></div>
+    <div class="topbar-logo"><svg width="22" height="22" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:7px;margin-bottom:2px">
+  <polygon points="28,3 50,15 50,41 28,53 6,41 6,15" fill="#1a0040" stroke="#7c3aed" stroke-width="3"/>
+  <text x="28" y="35" font-family="DM Sans,sans-serif" font-size="18" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text>
+</svg>Clinical<span>EDGE</span></div>
   </div>
   <div class="home-body">
     <div class="search-wrap">
@@ -259,6 +281,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   </div>
   <div class="content-body">
     <div class="content-title-h" id="content-title"></div>
+    <div id="question-box" class="question-box" style="display:none"><div class="question-label">CLINICAL QUESTION</div><div id="question-text"></div></div>
     <div class="content-img-wrap" id="content-img-wrap"></div>
     <button class="btn-explain" id="explain-btn" onclick="toggleExplanation()">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1 1 0 20A10 10 0 0 1 12 2z"/></svg>
@@ -269,6 +292,13 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
       <div class="explanation-images" id="explanation-images"></div>
     </div>
   </div>
+</div>
+
+
+<!-- FULLSCREEN IMAGE VIEWER -->
+<div id="img-viewer" onclick="closeViewer(event)">
+  <button id="img-viewer-close" onclick="document.getElementById('img-viewer').classList.remove('open')">&#x2715;</button>
+  <img id="img-viewer-img" src="" alt="">
 </div>
 
 <script>
@@ -286,6 +316,7 @@ let explanationVisible = false;
 
 // ── BOOT ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  // Show splash immediately — never block on network
   showScreen('screen-splash');
   hideLoading();
   const user = getUser();
@@ -295,6 +326,16 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('splash-name').textContent = user.first;
     loadAllContent().catch(() => {});
   }
+  // Handle device back button
+  window.addEventListener('popstate', () => {
+    const active = document.querySelector('.screen.active');
+    if (active && active.id !== 'screen-splash') {
+      if (active.id === 'screen-content') goBackFromContent();
+      else if (active.id === 'screen-category') showScreen('screen-home');
+      else if (active.id === 'screen-home') showScreen('screen-splash');
+      else showScreen('screen-splash');
+    }
+  });
 });
 
 // ── SPLASH ───────────────────────────────────
@@ -366,6 +407,7 @@ async function fetchTabContent(tabName) {
     const ii = ci('image_url');
     const gi = ci('tags');
     const ei = ci('explanation_images');
+    const qi = ci('question');
 
     return lines.slice(1).map((line, i) => {
       const c   = splitCSV(line);
@@ -387,6 +429,7 @@ async function fetchTabContent(tabName) {
         imageUrl: v(ii),
         tags:     v(gi),
         expImages,
+        question: v(qi),
       };
     }).filter(Boolean);
   } catch(e) {
@@ -537,6 +580,8 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  // Push state so device back button works
+  if (history.state !== id) history.pushState(id, '', '');
 }
 
 // ── LOADING ──────────────────────────────────
@@ -544,6 +589,16 @@ function hideLoading() {
   const ol = document.getElementById('loading-overlay');
   ol.style.opacity = '0';
   setTimeout(() => ol.classList.add('hidden'), 400);
+}
+// ── IMAGE FULLSCREEN VIEWER ──────────────────
+function openViewer(src) {
+  document.getElementById('img-viewer-img').src = src;
+  document.getElementById('img-viewer').classList.add('open');
+}
+function closeViewer(e) {
+  if (e.target === document.getElementById('img-viewer')) {
+    document.getElementById('img-viewer').classList.remove('open');
+  }
 }
 
 // ── SERVICE WORKER ───────────────────────────
