@@ -168,10 +168,10 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 
 .question-box{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.4);border-left:3px solid #9d5cf6;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;font-size:14px;color:var(--white2);line-height:1.65;font-style:italic}
 .question-label{font-size:10px;font-weight:600;color:var(--purple3);letter-spacing:1px;margin-bottom:6px;font-style:normal;display:block}
-#img-viewer{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.96);touch-action:none}
+#img-viewer{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.96)}
 #img-viewer.open{display:flex;align-items:center;justify-content:center}
-#img-viewer-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;font-family:sans-serif;line-height:1}
-#img-viewer-img{max-width:100%;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;user-select:none;-webkit-user-select:none}
+#img-viewer-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center}
+#img-viewer-img{max-width:100%;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;user-select:none;-webkit-user-select:none;pointer-events:none}
 .content-img-wrap img{cursor:zoom-in}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -249,7 +249,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 4: CATEGORY LIST ══ -->
 <div class="screen" id="screen-category">
   <div class="topbar">
-    <button class="back-btn" onclick="showScreen('screen-home')">
+    <button class="back-btn" onclick="goBack()">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
     </button>
     <div class="topbar-title" id="cat-screen-title"></div>
@@ -311,15 +311,19 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Device back button — listen for popstate
-window.addEventListener('popstate', () => {
-  const active = document.querySelector('.screen.active');
-  if (!active) return;
-  const id = active.id;
-  if (id === 'screen-content') goBackFromContent();
-  else if (id === 'screen-category') showScreen('screen-home');
-  else if (id === 'screen-register') showScreen('screen-splash');
-  else if (id === 'screen-home') showScreen('screen-splash');
+// Device back button — use our own stack
+window.addEventListener('popstate', (e) => {
+  // Pop the stack and go to previous screen
+  if (_screenStack.length > 1) {
+    _screenStack.pop(); // remove current
+    const prev = _screenStack[_screenStack.length-1] || 'screen-splash';
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(prev).classList.add('active');
+    window.scrollTo(0,0);
+    if (prev === 'screen-content') {
+      // nothing extra needed
+    }
+  }
 });
 
 // ── SPLASH ───────────────────────────────────
@@ -557,14 +561,31 @@ function toggleExplanation() {
   document.getElementById('explain-btn-text').textContent = explanationVisible ? 'Hide explanation' : 'Show explanation';
 }
 
-function goBackFromContent() { showScreen(prevScreen); }
+function goBackFromContent() { goBack(); }
 
 // ── SCREEN NAV ───────────────────────────────
+// Screen history stack for reliable back navigation
+const _screenStack = [];
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
-  history.pushState({screen: id}, '', '');
+  // Push to our own stack (don't rely on browser history)
+  if (_screenStack[_screenStack.length-1] !== id) {
+    _screenStack.push(id);
+  }
+  // Also push browser history state so device back key fires popstate
+  history.pushState({screen: id}, '');
+}
+
+function goBack() {
+  // Pop current screen off stack
+  _screenStack.pop();
+  const prev = _screenStack[_screenStack.length-1] || 'screen-splash';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(prev).classList.add('active');
+  window.scrollTo(0,0);
 }
 
 // ── LOADING ──────────────────────────────────
@@ -573,83 +594,70 @@ function hideLoading() {
   ol.style.opacity = '0';
   setTimeout(() => ol.classList.add('hidden'), 400);
 }
-// ── FULLSCREEN IMAGE VIEWER with pinch-zoom ──
-let _viewerScale = 1, _viewerLastDist = 0, _viewerStartScale = 1;
-let _dragX = 0, _dragY = 0, _lastX = 0, _lastY = 0, _isDragging = false;
+// ── FULLSCREEN VIEWER + PINCH ZOOM ──────────
+let _vScale = 1, _vDist0 = 0, _vScale0 = 1;
+let _vDx = 0, _vDy = 0, _vLx = 0, _vLy = 0, _vDrag = false;
 
 function openViewer(src) {
   const img = document.getElementById('img-viewer-img');
-  const viewer = document.getElementById('img-viewer');
   img.src = src;
-  _viewerScale = 1; _dragX = 0; _dragY = 0;
-  img.style.transform = 'translate(0px,0px) scale(1)';
-  viewer.classList.add('open');
+  _vScale = 1; _vDx = 0; _vDy = 0;
+  img.style.transform = 'translate(0,0) scale(1)';
+  document.getElementById('img-viewer').classList.add('open');
 }
 
 function closeViewer() {
   document.getElementById('img-viewer').classList.remove('open');
 }
 
-(function() {
+function _vUpdate() {
+  document.getElementById('img-viewer-img').style.transform =
+    `translate(${_vDx}px,${_vDy}px) scale(${_vScale})`;
+}
+
+// Attach touch events to document so they work in iOS PWA
+document.addEventListener('touchstart', (e) => {
   const viewer = document.getElementById('img-viewer');
-  const img    = document.getElementById('img-viewer-img');
-
-  function updateTransform() {
-    img.style.transform = `translate(${_dragX}px,${_dragY}px) scale(${_viewerScale})`;
-  }
-
-  // Tap background to close
-  viewer.addEventListener('click', (e) => {
-    if (e.target === viewer) closeViewer();
-  });
-
-  // Touch events for pinch-zoom and drag
-  viewer.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      _viewerLastDist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      _viewerStartScale = _viewerScale;
-      e.preventDefault();
-    } else if (e.touches.length === 1) {
-      _isDragging = true;
-      _lastX = e.touches[0].clientX;
-      _lastY = e.touches[0].clientY;
-    }
-  }, {passive: false});
-
-  viewer.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-      const dist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      _viewerScale = Math.min(5, Math.max(1, _viewerStartScale * (dist / _viewerLastDist)));
-      updateTransform();
-    } else if (e.touches.length === 1 && _isDragging && _viewerScale > 1) {
-      e.preventDefault();
-      _dragX += e.touches[0].clientX - _lastX;
-      _dragY += e.touches[0].clientY - _lastY;
-      _lastX = e.touches[0].clientX;
-      _lastY = e.touches[0].clientY;
-      updateTransform();
-    }
-  }, {passive: false});
-
-  viewer.addEventListener('touchend', (e) => {
-    if (e.touches.length < 2) _isDragging = false;
-    if (_viewerScale < 1.05) { _viewerScale = 1; _dragX = 0; _dragY = 0; updateTransform(); }
-  });
-
-  // Mouse wheel zoom for desktop
-  viewer.addEventListener('wheel', (e) => {
+  if (!viewer.classList.contains('open')) return;
+  if (e.target === viewer) { closeViewer(); return; }
+  if (e.touches.length === 2) {
     e.preventDefault();
-    _viewerScale = Math.min(5, Math.max(1, _viewerScale - e.deltaY * 0.002));
-    updateTransform();
-  }, {passive: false});
-})();
+    _vDist0 = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    _vScale0 = _vScale;
+  } else if (e.touches.length === 1) {
+    _vDrag = true;
+    _vLx = e.touches[0].clientX;
+    _vLy = e.touches[0].clientY;
+  }
+}, {passive: false});
+
+document.addEventListener('touchmove', (e) => {
+  const viewer = document.getElementById('img-viewer');
+  if (!viewer.classList.contains('open')) return;
+  e.preventDefault();
+  if (e.touches.length === 2) {
+    const d = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    _vScale = Math.min(5, Math.max(1, _vScale0 * (d / _vDist0)));
+    _vUpdate();
+  } else if (e.touches.length === 1 && _vDrag && _vScale > 1) {
+    _vDx += e.touches[0].clientX - _vLx;
+    _vDy += e.touches[0].clientY - _vLy;
+    _vLx = e.touches[0].clientX;
+    _vLy = e.touches[0].clientY;
+    _vUpdate();
+  }
+}, {passive: false});
+
+document.addEventListener('touchend', () => {
+  _vDrag = false;
+  if (_vScale < 1.05) { _vScale = 1; _vDx = 0; _vDy = 0; _vUpdate(); }
+});
 
 // ── SERVICE WORKER ──
 if ('serviceWorker' in navigator) {
