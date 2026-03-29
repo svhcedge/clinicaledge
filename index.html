@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ClinicalEDGE">
 <meta name="theme-color" content="#0a0f1e">
+<link rel="manifest" href="manifest.json">
 <title>ClinicalEDGE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
@@ -284,15 +285,18 @@ let explanationVisible = false;
 
 // ── BOOT ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  // Hide loading and show splash IMMEDIATELY — never block on network
+  showScreen('screen-splash');
+  hideLoading();
+
   const user = getUser();
   if (user) {
     document.getElementById('splash-tagline').style.display = 'none';
     document.getElementById('splash-greeting').classList.add('show');
     document.getElementById('splash-name').textContent = user.first;
-    loadAllContent(); // preload silently in background
+    // Preload content silently — errors ignored, Enter button will retry
+    loadAllContent().catch(() => {});
   }
-  showScreen('screen-splash');
-  hideLoading();
 });
 
 // ── SPLASH ───────────────────────────────────
@@ -542,6 +546,12 @@ function hideLoading() {
   const ol = document.getElementById('loading-overlay');
   ol.style.opacity = '0';
   setTimeout(() => ol.classList.add('hidden'), 400);
+}
+// ── SERVICE WORKER ───────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
 }
 </script>
 </body>
