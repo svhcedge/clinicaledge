@@ -39,7 +39,8 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .orb1{width:360px;height:360px;background:rgba(124,58,237,0.3);top:-100px;right:-100px}
 .orb2{width:240px;height:240px;background:rgba(157,92,246,0.2);bottom:-60px;left:-80px}
 .splash-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
-.splash-logo{font-size:46px;font-weight:600;letter-spacing:-1.5px;color:var(--white);line-height:1;animation:floatUp 0.6s ease both}
+.splash-logo-wrap{animation:floatUp 0.6s ease both;margin-bottom:14px}
+.splash-logo{font-size:40px;font-weight:600;letter-spacing:-1.5px;color:var(--white);line-height:1;animation:floatUp 0.6s 0.05s ease both}
 .splash-logo span{color:var(--purple3)}
 .splash-org{margin-top:12px;font-size:12px;font-weight:400;color:var(--white3);letter-spacing:0.5px;line-height:1.7;animation:floatUp 0.6s 0.1s ease both}
 .splash-line{width:48px;height:1px;background:var(--border2);margin:32px auto;animation:floatUp 0.6s 0.2s ease both}
@@ -182,7 +183,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="splash-content">
-    <div class="splash-logo">Clinical<span>EDGE</span></div>
+    <div class="splash-logo-wrap"><svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="26,4 44,14 44,38 26,48 8,38 8,14" fill="rgba(124,58,237,0.18)" stroke="#7c3aed" stroke-width="1.5"/><polygon points="26,10 40,18 40,34 26,42 12,34 12,18" fill="rgba(124,58,237,0.08)" stroke="#9d5cf6" stroke-width="0.5"/><text x="26" y="31" font-family="DM Sans,sans-serif" font-size="13" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text></svg></div><div class="splash-logo">Clinical<span>EDGE</span></div>
     <div class="splash-org">
       Academic Division of St Vincent Hospital<br>IM Residency Program
     </div>
@@ -205,7 +206,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 2: REGISTER ══ -->
 <div class="screen" id="screen-register">
   <div class="reg-top">
-    <div class="reg-logo">Clinical<span>EDGE</span></div>
+    <div class="reg-logo"><svg width="28" height="28" viewBox="0 0 52 52" fill="none" style="vertical-align:middle;margin-right:8px;margin-bottom:3px"><polygon points="26,4 44,14 44,38 26,48 8,38 8,14" fill="rgba(124,58,237,0.25)" stroke="#9d5cf6" stroke-width="2"/><text x="26" y="32" font-family="DM Sans,sans-serif" font-size="16" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text></svg>Clinical<span>EDGE</span></div>
     <div class="reg-org">Academic Division of St Vincent Hospital<br>IM Residency Program</div>
   </div>
   <div class="reg-card">
@@ -222,7 +223,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 3: HOME ══ -->
 <div class="screen" id="screen-home">
   <div class="topbar">
-    <div class="topbar-logo">Clinical<span>EDGE</span></div>
+    <div class="topbar-logo"><svg width="20" height="20" viewBox="0 0 52 52" fill="none" style="vertical-align:middle;margin-right:6px;margin-bottom:2px"><polygon points="26,4 44,14 44,38 26,48 8,38 8,14" fill="rgba(124,58,237,0.25)" stroke="#9d5cf6" stroke-width="2"/><text x="26" y="32" font-family="DM Sans,sans-serif" font-size="16" font-weight="600" fill="#c084fc" text-anchor="middle">CE</text></svg>Clinical<span>EDGE</span></div>
   </div>
   <div class="home-body">
     <div class="search-wrap">
@@ -285,16 +286,13 @@ let explanationVisible = false;
 
 // ── BOOT ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  // Hide loading and show splash IMMEDIATELY — never block on network
   showScreen('screen-splash');
   hideLoading();
-
   const user = getUser();
   if (user) {
     document.getElementById('splash-tagline').style.display = 'none';
     document.getElementById('splash-greeting').classList.add('show');
     document.getElementById('splash-name').textContent = user.first;
-    // Preload content silently — errors ignored, Enter button will retry
     loadAllContent().catch(() => {});
   }
 });
@@ -547,6 +545,7 @@ function hideLoading() {
   ol.style.opacity = '0';
   setTimeout(() => ol.classList.add('hidden'), 400);
 }
+
 // ── SERVICE WORKER ───────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
