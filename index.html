@@ -464,14 +464,13 @@ async function loadTabNames() {
     const res  = await fetch(url);
     if (!res.ok) return [];
     const text = await res.text();
-    const lines = text.trim().split('\n').filter(l => l.trim());
+    const rows = parseCSVFull(text);
     tabLogos = {};
     const tabs = [];
-    // lines[0] is header row — skip it
-    for (let i = 1; i < lines.length; i++) {
-      const cols = splitCSV(lines[i]);
-      const name = csvVal(cols[0]);
-      const logo = cols[1] ? csvVal(cols[1]) : '';
+    // rows[0] is header row — skip it
+    for (let i = 1; i < rows.length; i++) {
+      const name = csvVal(rows[i][0] || '');
+      const logo = rows[i][1] ? csvVal(rows[i][1]) : '';
       if (!name || name.toLowerCase() === 'tabs' || name.toLowerCase() === 'categories' || name.startsWith('_')) continue;
       tabs.push(name);
       if (logo) tabLogos[name] = driveURL(logo);
@@ -489,9 +488,9 @@ async function fetchTabContent(tabName) {
     const res  = await fetch(url);
     if (!res.ok) return [];
     const text = await res.text();
-    const lines = text.trim().split('\n').filter(l => l.trim());
-    if (lines.length < 2) return [];
-    const headers = splitCSV(lines[0]).map(h => csvVal(h).toLowerCase().trim());
+    const rows = parseCSVFull(text);
+    if (rows.length < 2) return [];
+    const headers = rows[0].map(h => csvVal(h).toLowerCase().trim());
     const ci = n => { const i = headers.indexOf(n); return i; };
     const ti = ci('title') >= 0 ? ci('title') : 0;
     const bi = ci('body_text');
@@ -499,9 +498,8 @@ async function fetchTabContent(tabName) {
     const gi = ci('tags');
     const ei = ci('explanation_images');
     const qi = ci('question');
-    return lines.slice(1).map((line, idx) => {
-      const cols = splitCSV(line);
-      const v = i => (i >= 0 && cols[i]) ? csvVal(cols[i]) : '';
+    return rows.slice(1).map((cols, idx) => {
+      const v = i => (i >= 0 && cols[i] != null) ? csvVal(cols[i]) : '';
       const title = v(ti);
       if (!title) return null;
       const expRaw = v(ei);
@@ -509,6 +507,30 @@ async function fetchTabContent(tabName) {
       return { id:`${tabName}__${idx}`, category:tabName, title, body:v(bi), imageUrl:v(ii), tags:v(gi), expImages, question:v(qi) };
     }).filter(Boolean);
   } catch(e) { return []; }
+}
+
+// Parse entire CSV text handling multi-line quoted fields
+function parseCSVFull(text) {
+  const rows = [];
+  let cur = '', inQ = false, row = [];
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      if (inQ && text[i+1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (c === ',' && !inQ) {
+      row.push(cur); cur = '';
+    } else if ((c === '\n') && !inQ) {
+      row.push(cur); cur = '';
+      rows.push(row); row = [];
+    } else if (c === '\r') {
+      // skip carriage returns
+    } else {
+      cur += c;
+    }
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
 }
 
 function splitCSV(line) {
