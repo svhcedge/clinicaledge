@@ -88,6 +88,8 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .topbar-title{font-size:16px;font-weight:500;color:var(--white);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* STAR BUTTON */
+.logout-btn{background:rgba(124,58,237,0.15);border:1px solid var(--border2);border-radius:20px;color:var(--purple3);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;padding:5px 12px;flex-shrink:0;transition:background .2s}
+.logout-btn:hover{background:rgba(124,58,237,0.25)}
 .star-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:4px 0 4px 8px;line-height:1;color:var(--muted);flex-shrink:0;transition:color .15s,transform .1s}
 .star-btn.starred{color:#facc15}
 .star-btn:active{transform:scale(1.3)}
@@ -218,7 +220,11 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 
 <!-- SCREEN 3: HOME -->
 <div class="screen" id="screen-home">
-  <div class="topbar"><div class="topbar-logo">Clinical<span>EDGE</span></div></div>
+  <div class="topbar">
+    <div class="topbar-logo">Clinical<span>EDGE</span></div>
+    <div id="home-greeting" style="font-size:12px;color:var(--muted);flex-shrink:0"></div>
+    <button class="logout-btn" id="logout-btn" onclick="handleLogout()" title="Logout" style="display:none">Logout</button>
+  </div>
   <div class="home-body">
     <div class="search-wrap">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
@@ -312,6 +318,30 @@ window.addEventListener('DOMContentLoaded', () => {
 // Device back button
 window.addEventListener('popstate', () => { navBack(); });
 
+// ── LOGOUT ───────────────────────────────────────────
+function handleLogout() {
+  if (!confirm('Log out of ClinicalEDGE?')) return;
+  localStorage.removeItem('ce_user');
+  localStorage.removeItem('ce_favs');
+  // Reset nav stack
+  navStack.length = 0;
+  // Reset splash to first-time state
+  document.getElementById('splash-tagline').style.display = 'block';
+  document.getElementById('splash-greeting').classList.remove('show');
+  document.getElementById('splash-name').textContent = '';
+  showScreen('screen-splash');
+}
+
+function updateHomeGreeting() {
+  const user = getUser();
+  const greet = document.getElementById('home-greeting');
+  const logoutBtn = document.getElementById('logout-btn');
+  if (user && greet) {
+    greet.textContent = `Hello, ${user.first}`;
+    if (logoutBtn) logoutBtn.style.display = 'block';
+  }
+}
+
 // ── SCREEN NAVIGATION ───────────────────────────────
 function showScreen(id) {
   // Never navigate to register if already signed in
@@ -375,6 +405,7 @@ async function handleSplashEnter() {
 
   if (!allContent.length) await loadAllContent().catch(() => {});
   renderTiles();
+  updateHomeGreeting();
   showScreen('screen-home');
   btn.textContent = 'Enter'; btn.disabled = false;
 }
@@ -396,23 +427,15 @@ async function handleRegister() {
   if (code !== INSTITUTION_CODE) { showRegError('Invalid institution code. Please contact your administrator.'); return; }
   btn.textContent = 'Registering…'; btn.disabled = true;
 
-  // Register user with Apps Script backend
+  // Register user with Apps Script backend (fire and forget — no-cors required)
   try {
-    const res  = await fetch(APPS_URL, {
+    fetch(APPS_URL, {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      mode: 'no-cors',
+      headers: {'Content-Type':'text/plain'},
       body: JSON.stringify({ action:'register', first, last, email })
-    });
-    const json = await res.json();
-    if (json.blocked) {
-      showRegError('Your access has been revoked. Please contact the administrator.');
-      btn.textContent = 'Register & Enter'; btn.disabled = false;
-      return;
-    }
-  } catch(e) {
-    // If backend unreachable, allow login but skip sync
-    console.warn('Backend unreachable:', e);
-  }
+    }).catch(() => {});
+  } catch(e) { console.warn('Backend unreachable:', e); }
 
   saveUser({ first, last, email, registeredAt: new Date().toISOString() });
 
@@ -422,6 +445,7 @@ async function handleRegister() {
   btn.textContent = 'Loading content…';
   await loadAllContent().catch(() => {});
   renderTiles();
+  updateHomeGreeting();
   showScreen('screen-home');
   btn.textContent = 'Register & Enter'; btn.disabled = false;
 }
@@ -544,7 +568,8 @@ function saveFavs(f) {
   if (!user) return;
   fetch(APPS_URL, {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    mode: 'no-cors',
+    headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'saveFavs', email: user.email, favorites: f })
   }).catch(() => {});
 }
