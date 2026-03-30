@@ -282,6 +282,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 const SHEET_ID         = '1gzTGUuVuUoW4MLApbZOkvYmSi7Z8ibbP7pWGAN3DTcg';
 const INSTITUTION_CODE = 'EDGE26';
 const TABS_SHEET       = '_tabs';
+const APPS_URL         = 'https://script.google.com/macros/s/AKfycbyezSKI8DVaPT0VnO69gVt0kI5jJcYOrsOiY2IbQELJGZM4uBF4HLAB4xK35_B0ghBR/exec';
 const ICON_LIST        = ['🫀','🩻','🧠','🦟','🔬','📄','💊','🩺','📊','🧬','💉','📋'];
 
 // ── STATE ───────────────────────────────────────────
@@ -348,6 +349,30 @@ async function handleSplashEnter() {
   if (!user) { showScreen('screen-register'); return; }
   const btn = document.getElementById('splash-btn');
   btn.textContent = 'Loading…'; btn.disabled = true;
+
+  // Check if user is blocked and load their favorites
+  try {
+    const res  = await fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`);
+    const json = await res.json();
+    if (json.blocked) {
+      localStorage.removeItem('ce_user');
+      localStorage.removeItem('ce_favs');
+      showScreen('screen-register');
+      showRegError('Your access has been revoked. Please contact the administrator.');
+      btn.textContent = 'Enter'; btn.disabled = false;
+      return;
+    }
+    // Load latest favorites from server
+    if (json.favorites !== undefined) {
+      const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
+      saveFavs(favArr);
+    } else {
+      await loadFavsFromServer(user.email);
+    }
+  } catch(e) {
+    console.warn('Backend unreachable, using local favs:', e);
+  }
+
   if (!allContent.length) await loadAllContent().catch(() => {});
   renderTiles();
   showScreen('screen-home');
@@ -369,8 +394,32 @@ async function handleRegister() {
   if (!first||!last||!email||!code) { showRegError('Please fill in all fields.'); return; }
   if (!email.includes('@')||!email.includes('.')) { showRegError('Please enter a valid email address.'); return; }
   if (code !== INSTITUTION_CODE) { showRegError('Invalid institution code. Please contact your administrator.'); return; }
-  btn.textContent = 'Loading content…'; btn.disabled = true;
+  btn.textContent = 'Registering…'; btn.disabled = true;
+
+  // Register user with Apps Script backend
+  try {
+    const res  = await fetch(APPS_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'register', first, last, email })
+    });
+    const json = await res.json();
+    if (json.blocked) {
+      showRegError('Your access has been revoked. Please contact the administrator.');
+      btn.textContent = 'Register & Enter'; btn.disabled = false;
+      return;
+    }
+  } catch(e) {
+    // If backend unreachable, allow login but skip sync
+    console.warn('Backend unreachable:', e);
+  }
+
   saveUser({ first, last, email, registeredAt: new Date().toISOString() });
+
+  // Load favorites from backend
+  await loadFavsFromServer(email);
+
+  btn.textContent = 'Loading content…';
   await loadAllContent().catch(() => {});
   renderTiles();
   showScreen('screen-home');
@@ -476,8 +525,29 @@ function driveURL(url) {
 }
 
 // ── FAVORITES ───────────────────────────────────────
+async function loadFavsFromServer(email) {
+  try {
+    const res  = await fetch(`${APPS_URL}?action=getFavs&email=${encodeURIComponent(email)}`);
+    const json = await res.json();
+    if (json.ok && json.favorites) {
+      const favArr = json.favorites.split(',').filter(Boolean);
+      localStorage.setItem('ce_favs', JSON.stringify(favArr));
+    }
+  } catch(e) { /* use local favs */ }
+}
+
 function getFavs()       { try { return JSON.parse(localStorage.getItem('ce_favs')||'[]'); } catch(e){return[];} }
-function saveFavs(f)     { localStorage.setItem('ce_favs', JSON.stringify(f)); }
+function saveFavs(f) {
+  localStorage.setItem('ce_favs', JSON.stringify(f));
+  // Sync to server
+  const user = getUser();
+  if (!user) return;
+  fetch(APPS_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'saveFavs', email: user.email, favorites: f })
+  }).catch(() => {});
+}
 function isFav(id)       { return getFavs().includes(id); }
 function toggleFavorite() {
   if (!currentItemId) return;
