@@ -166,12 +166,27 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-sub{font-size:13px;color:var(--muted)}
 
+/* Question box */
 .question-box{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.4);border-left:3px solid #9d5cf6;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;font-size:14px;color:var(--white2);line-height:1.65;font-style:italic}
 .question-label{font-size:10px;font-weight:600;color:var(--purple3);letter-spacing:1px;margin-bottom:6px;font-style:normal;display:block}
+
+/* Feedback text */
+.feedback-note{font-size:12px;color:var(--muted);text-align:center;padding:16px 8px 4px;line-height:1.6}
+.feedback-note a{color:var(--purple3);text-decoration:none}
+.home-feedback{font-size:12px;color:var(--muted);text-align:center;padding:20px 8px 8px;line-height:1.6}
+.home-feedback a{color:var(--purple3);text-decoration:none}
+
+/* Star / favorites */
+.star-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:4px 6px;line-height:1;color:#888;transition:color .15s,transform .15s}
+.star-btn.active{color:#facc15}
+.star-btn:active{transform:scale(1.3)}
+.fav-badge{position:absolute;top:8px;right:8px;font-size:16px;line-height:1}
+
+/* Fullscreen viewer */
 #img-viewer{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.96)}
 #img-viewer.open{display:flex;align-items:center;justify-content:center}
 #img-viewer-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center}
-#img-viewer-img{max-width:100%;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;user-select:none;-webkit-user-select:none;pointer-events:none}
+#img-viewer-img{max-width:100%;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;user-select:none;-webkit-user-select:none;pointer-events:none;-webkit-user-drag:none}
 .content-img-wrap img{cursor:zoom-in}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -242,6 +257,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <div id="tiles-section">
       <div class="tiles-label">CATEGORIES</div>
       <div id="tiles-grid"></div>
+      <div class="home-feedback">Please email any feedback, questions or concerns regarding the app to <a href="mailto:svhcedge@gmail.com">svhcedge@gmail.com</a></div>
     </div>
   </div>
 </div>
@@ -249,7 +265,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 <!-- ══ SCREEN 4: CATEGORY LIST ══ -->
 <div class="screen" id="screen-category">
   <div class="topbar">
-    <button class="back-btn" onclick="goBack()">
+    <button class="back-btn" onclick="showScreen('screen-home')">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
     </button>
     <div class="topbar-title" id="cat-screen-title"></div>
@@ -264,6 +280,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
     </button>
     <div class="topbar-title" id="content-screen-title"></div>
+    <button class="star-btn" id="star-btn" onclick="toggleFavorite()" title="Add to favorites">&#9733;</button>
   </div>
   <div class="content-body">
     <div class="content-title-h" id="content-title"></div>
@@ -277,6 +294,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
       <div class="explanation-text" id="explanation-text"></div>
       <div class="explanation-images" id="explanation-images"></div>
     </div>
+    <div class="feedback-note">Please email any feedback, questions or concerns regarding the contents to <a href="mailto:cmr@svhmedresidency.com">cmr@svhmedresidency.com</a></div>
   </div>
 </div>
 
@@ -289,18 +307,26 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 // ── CONFIG ───────────────────────────────────
 const SHEET_ID         = '1gzTGUuVuUoW4MLApbZOkvYmSi7Z8ibbP7pWGAN3DTcg';
 const INSTITUTION_CODE = 'EDGE26';
-const TABS             = ['ECG','IMAGING','MMB','BUG BITES','POCUS','ONE PAGERS'];
-const ICONS            = ['🫀','🩻','🧠','🦟','🔬','📄'];
+const TABS_SHEET       = '_tabs';   // sheet tab listing category names in column A
+// Leave APPS_SCRIPT_URL blank until you set up Apps Script for cross-device favorites
+const APPS_SCRIPT_URL  = '';
+const ICON_LIST = ['🫀','🩻','🧠','🦟','🔬','📄','💊','🩺','📊','🔬','⚗️','🏥','📋','🧬','💉'];
 
 // ── STATE ────────────────────────────────────
 let allContent         = [];
+let sheetTabs          = [];   // loaded dynamically from _tabs sheet
 let fuse               = null;
 let prevScreen         = 'screen-home';
 let explanationVisible = false;
+let currentItemId      = null; // tracks open content item for star button
+
+// Screen history stack for reliable back navigation
+const _screenStack = ['screen-splash'];
 
 // ── BOOT ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  showScreen('screen-splash');
+  // Always show splash immediately
+  _showScreenDirect('screen-splash');
   hideLoading();
   const user = getUser();
   if (user) {
@@ -309,20 +335,16 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('splash-name').textContent = user.first;
     loadAllContent().catch(() => {});
   }
+  // Seed browser history
+  history.replaceState({screen: 'screen-splash'}, '');
 });
 
-// Device back button — use our own stack
-window.addEventListener('popstate', (e) => {
-  // Pop the stack and go to previous screen
+// Device back button — uses our stack
+window.addEventListener('popstate', () => {
   if (_screenStack.length > 1) {
-    _screenStack.pop(); // remove current
-    const prev = _screenStack[_screenStack.length-1] || 'screen-splash';
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(prev).classList.add('active');
-    window.scrollTo(0,0);
-    if (prev === 'screen-content') {
-      // nothing extra needed
-    }
+    _screenStack.pop();
+    const prev = _screenStack[_screenStack.length - 1];
+    _showScreenDirect(prev);
   }
 });
 
@@ -376,8 +398,24 @@ function showRegError(msg) {
   el.style.display = 'block';
 }
 
+// ── LOAD TAB NAMES FROM _tabs SHEET ──────────
+async function loadTabNames() {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TABS_SHEET)}`;
+  try {
+    const res  = await fetch(url);
+    if (!res.ok) return [];
+    const text = await res.text();
+    const lines = text.trim().split('\n').filter(l => l.trim());
+    // Skip header row, return non-empty non-header values
+    return lines.slice(1)
+      .map(l => splitCSV(l)[0].replace(/^"|"$/g,'').trim())
+      .filter(n => n && n.toLowerCase() !== 'tabs' && n.toLowerCase() !== 'categories');
+  } catch(e) { return []; }
+}
+
 // ── FETCH & PARSE ────────────────────────────
-// Columns expected: title | body_text | image_url | tags | explanation_images
+// Columns (order-independent by header name):
+// title | body_text | image_url | tags | explanation_images | question
 async function fetchTabContent(tabName) {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
   try {
@@ -438,7 +476,10 @@ function splitCSV(line) {
 }
 
 async function loadAllContent() {
-  const results = await Promise.all(TABS.map(fetchTabContent));
+  // Load tab names dynamically from _tabs sheet
+  sheetTabs = await loadTabNames();
+  if (!sheetTabs.length) { console.warn('No tabs found in _tabs sheet'); return; }
+  const results = await Promise.all(sheetTabs.map(fetchTabContent));
   allContent = results.flat();
   fuse = new Fuse(allContent, { keys:['title','tags','category'], threshold:0.38, includeScore:true });
 }
@@ -454,12 +495,20 @@ function toDriveDirectURL(url) {
 function renderTiles() {
   const grid = document.getElementById('tiles-grid');
   grid.innerHTML = '';
-  TABS.forEach((tab, idx) => {
+  // Favorites tile first
+  const favs = getFavorites();
+  const favTile = document.createElement('div');
+  favTile.className = 'tile';
+  favTile.innerHTML = `<div class="tile-icon">⭐</div><div class="tile-name">Favorites</div><div class="tile-count">${favs.length} saved</div>`;
+  favTile.onclick = () => openFavorites();
+  grid.appendChild(favTile);
+  // Category tiles from sheet
+  sheetTabs.forEach((tab, idx) => {
     const count = allContent.filter(c => c.category === tab).length;
     const tile  = document.createElement('div');
     tile.className = 'tile';
     tile.innerHTML = `
-      <div class="tile-icon">${ICONS[idx]||'📋'}</div>
+      <div class="tile-icon">${ICON_LIST[idx % ICON_LIST.length]}</div>
       <div class="tile-name">${tab}</div>
       <div class="tile-count">${count} item${count!==1?'s':''}</div>`;
     tile.onclick = () => openCategory(tab);
@@ -561,31 +610,82 @@ function toggleExplanation() {
   document.getElementById('explain-btn-text').textContent = explanationVisible ? 'Hide explanation' : 'Show explanation';
 }
 
-function goBackFromContent() { goBack(); }
+function goBackFromContent() {
+  if (_screenStack.length > 1) {
+    _screenStack.pop();
+    const prev = _screenStack[_screenStack.length - 1];
+    _showScreenDirect(prev);
+    history.pushState({screen: prev}, '');
+  }
+}
 
 // ── SCREEN NAV ───────────────────────────────
-// Screen history stack for reliable back navigation
-const _screenStack = [];
-
-function showScreen(id) {
+// Internal: switch screen without touching the stack
+function _showScreenDirect(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-  // Push to our own stack (don't rely on browser history)
-  if (_screenStack[_screenStack.length-1] !== id) {
+  window.scrollTo(0, 0);
+}
+
+// Public: switch screen AND update stack + browser history
+function showScreen(id) {
+  // Never push register onto stack after user is already signed in
+  if (id === 'screen-register' && getUser()) return;
+  // Avoid duplicate entries
+  if (_screenStack[_screenStack.length - 1] !== id) {
     _screenStack.push(id);
   }
-  // Also push browser history state so device back key fires popstate
+  _showScreenDirect(id);
   history.pushState({screen: id}, '');
 }
 
-function goBack() {
-  // Pop current screen off stack
-  _screenStack.pop();
-  const prev = _screenStack[_screenStack.length-1] || 'screen-splash';
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(prev).classList.add('active');
-  window.scrollTo(0,0);
+// ── FAVORITES ────────────────────────────────
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem('ce_favs') || '[]'); } catch(e) { return []; }
+}
+function saveFavorites(favs) {
+  localStorage.setItem('ce_favs', JSON.stringify(favs));
+  // Sync to Apps Script if configured
+  if (APPS_SCRIPT_URL) {
+    const user = getUser();
+    fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'saveFavs', email: user?.email, favs })
+    }).catch(() => {});
+  }
+}
+function isFavorite(id) { return getFavorites().includes(id); }
+function toggleFavorite() {
+  if (!currentItemId) return;
+  let favs = getFavorites();
+  if (favs.includes(currentItemId)) {
+    favs = favs.filter(f => f !== currentItemId);
+  } else {
+    favs.push(currentItemId);
+  }
+  saveFavorites(favs);
+  const starBtn = document.getElementById('star-btn');
+  starBtn.classList.toggle('active', favs.includes(currentItemId));
+  // Refresh tile count if on home
+  renderTiles();
+}
+
+function openFavorites() {
+  const favs = getFavorites();
+  const items = allContent.filter(c => favs.includes(c.id));
+  document.getElementById('cat-screen-title').textContent = '⭐ Favorites';
+  const list = document.getElementById('content-list');
+  list.innerHTML = items.length
+    ? items.map((item,i) => `
+        <div class="content-list-item" onclick="openContentById('${item.id}','screen-category')">
+          <span class="content-list-num">${i+1}</span>
+          <span class="content-list-title">${item.title}</span>
+          <span style="font-size:11px;color:var(--muted);flex-shrink:0">${item.category}</span>
+        </div>`).join('')
+    : '<div class="status-msg"><div class="status-icon">⭐</div><div class="status-title">No favorites yet</div>Tap the star on any content page to save it here.</div>';
+  prevScreen = 'screen-home';
+  showScreen('screen-category');
 }
 
 // ── LOADING ──────────────────────────────────
@@ -595,74 +695,67 @@ function hideLoading() {
   setTimeout(() => ol.classList.add('hidden'), 400);
 }
 // ── FULLSCREEN VIEWER + PINCH ZOOM ──────────
-let _vScale = 1, _vDist0 = 0, _vScale0 = 1;
-let _vDx = 0, _vDy = 0, _vLx = 0, _vLy = 0, _vDrag = false;
+let _vScale=1, _vDist0=0, _vScale0=1, _vDx=0, _vDy=0, _vLx=0, _vLy=0, _vDrag=false;
 
 function openViewer(src) {
   const img = document.getElementById('img-viewer-img');
   img.src = src;
-  _vScale = 1; _vDx = 0; _vDy = 0;
+  _vScale=1; _vDx=0; _vDy=0;
   img.style.transform = 'translate(0,0) scale(1)';
   document.getElementById('img-viewer').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-
 function closeViewer() {
   document.getElementById('img-viewer').classList.remove('open');
+  document.body.style.overflow = '';
 }
-
 function _vUpdate() {
   document.getElementById('img-viewer-img').style.transform =
     `translate(${_vDx}px,${_vDy}px) scale(${_vScale})`;
 }
-
-// Attach touch events to document so they work in iOS PWA
+// Use document-level listeners — required for iOS PWA to capture touch events
 document.addEventListener('touchstart', (e) => {
-  const viewer = document.getElementById('img-viewer');
-  if (!viewer.classList.contains('open')) return;
-  if (e.target === viewer) { closeViewer(); return; }
+  if (!document.getElementById('img-viewer').classList.contains('open')) return;
+  if (e.target.id === 'img-viewer' || e.target.id === 'img-viewer-close') return;
   if (e.touches.length === 2) {
     e.preventDefault();
-    _vDist0 = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
+    _vDist0 = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
     _vScale0 = _vScale;
-  } else if (e.touches.length === 1) {
-    _vDrag = true;
-    _vLx = e.touches[0].clientX;
-    _vLy = e.touches[0].clientY;
+  } else if (e.touches.length === 1 && _vScale > 1) {
+    _vDrag=true; _vLx=e.touches[0].clientX; _vLy=e.touches[0].clientY;
   }
-}, {passive: false});
+}, {passive:false});
 
 document.addEventListener('touchmove', (e) => {
-  const viewer = document.getElementById('img-viewer');
-  if (!viewer.classList.contains('open')) return;
+  if (!document.getElementById('img-viewer').classList.contains('open')) return;
   e.preventDefault();
   if (e.touches.length === 2) {
-    const d = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    _vScale = Math.min(5, Math.max(1, _vScale0 * (d / _vDist0)));
+    const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    _vScale = Math.min(5, Math.max(1, _vScale0 * (d/_vDist0)));
     _vUpdate();
-  } else if (e.touches.length === 1 && _vDrag && _vScale > 1) {
+  } else if (e.touches.length === 1 && _vDrag) {
     _vDx += e.touches[0].clientX - _vLx;
     _vDy += e.touches[0].clientY - _vLy;
-    _vLx = e.touches[0].clientX;
-    _vLy = e.touches[0].clientY;
+    _vLx=e.touches[0].clientX; _vLy=e.touches[0].clientY;
     _vUpdate();
   }
-}, {passive: false});
+}, {passive:false});
 
-document.addEventListener('touchend', () => {
-  _vDrag = false;
-  if (_vScale < 1.05) { _vScale = 1; _vDx = 0; _vDy = 0; _vUpdate(); }
+document.addEventListener('touchend', (e) => {
+  _vDrag=false;
+  if (e.touches.length===0 && _vScale<1.05) { _vScale=1; _vDx=0; _vDy=0; _vUpdate(); }
 });
 
-// ── SERVICE WORKER ──
+// Tap viewer background to close
+document.getElementById('img-viewer').addEventListener('click', (e) => {
+  if (e.target.id === 'img-viewer') closeViewer();
+});
+
+// ── SERVICE WORKER ──────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
+
 </script>
 </body>
 </html>
