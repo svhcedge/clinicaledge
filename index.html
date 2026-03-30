@@ -461,10 +461,17 @@ async function loadAllContent() {
 // ── DRIVE URL ───────────────────────────────────────
 function driveURL(url) {
   if (!url) return '';
-  // Support multiple Google Drive URL formats
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
-  // Already a direct URL
+  url = url.trim();
+  // Extract file ID from any Google Drive share URL format
+  let id = null;
+  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m1) id = m1[1];
+  else if (m2) id = m2[1];
+  if (id) {
+    // lh3 worked reliably before — use it as primary, thumbnail as fallback
+    return `https://lh3.googleusercontent.com/d/${id}`;
+  }
   return url;
 }
 

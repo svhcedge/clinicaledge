@@ -1,5 +1,5 @@
 // Change this version number every time you deploy — forces cache refresh
-const CACHE = 'clinicaledge-v1774840756';
+const CACHE = 'clinicaledge-v1774841608';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
