@@ -138,7 +138,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 /* CONTENT PAGE */
 #screen-content{background:var(--bg)}
 .content-body{flex:1;padding:16px;padding-bottom:40px}
-.content-title-h{font-size:20px;font-weight:600;color:var(--white);margin-bottom:16px;line-height:1.3}
+.content-title-h{font-size:16px;font-weight:500;color:var(--white3);margin-bottom:12px;line-height:1.4}
 .question-box{background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.4);border-left:3px solid var(--purple2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px}
 .question-label{font-size:10px;font-weight:600;color:var(--purple3);letter-spacing:1px;display:block;margin-bottom:6px}
 .question-text{font-size:16px;color:var(--white2);line-height:1.65;font-style:italic}
@@ -161,7 +161,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 #img-viewer{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.96);display:none;align-items:center;justify-content:center;touch-action:none}
 #img-viewer.open{display:flex}
 #img-viewer-close{position:absolute;top:72px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
-#img-viewer-img{max-width:100vw;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;will-change:transform;touch-action:none;user-select:none;-webkit-user-select:none;pointer-events:none}
+#img-viewer-img{max-width:100vw;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;will-change:transform;touch-action:none;user-select:none;-webkit-user-select:none}
 
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -240,6 +240,9 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
     </button>
     <div class="topbar-title" id="cat-screen-title"></div>
+    <button class="home-btn" onclick="goHome()" title="Home">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    </button>
   </div>
   <div class="cat-body"><div id="content-list"></div></div>
 </div>
@@ -458,8 +461,11 @@ async function loadAllContent() {
 // ── DRIVE URL ───────────────────────────────────────
 function driveURL(url) {
   if (!url) return '';
+  // Support multiple Google Drive URL formats
   const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  return m ? `https://lh3.googleusercontent.com/d/${m[1]}` : url;
+  if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+  // Already a direct URL
+  return url;
 }
 
 // ── FAVORITES ───────────────────────────────────────
@@ -644,42 +650,62 @@ function _vu() {
   document.getElementById('img-viewer-img').style.transform = `translate(${_vx}px,${_vy}px) scale(${_vs})`;
 }
 
-// Touch events on document so iOS PWA captures them
-document.addEventListener('touchstart', function(e) {
-  if (!document.getElementById('img-viewer').classList.contains('open')) return;
-  const t = e.target;
-  // Tap close button
-  if (t.id === 'img-viewer-close') { closeViewer(); return; }
-  // Tap background
-  if (t.id === 'img-viewer') { closeViewer(); return; }
-  if (e.touches.length === 2) {
+// Attach zoom handlers directly to viewer element
+// This is required for iOS PWA standalone mode
+(function() {
+  function getViewer() { return document.getElementById('img-viewer'); }
+
+  // Use both document AND viewer-level listeners for maximum compatibility
+  function onTS(e) {
+    if (!getViewer().classList.contains('open')) return;
+    const t = e.target;
+    if (t.id === 'img-viewer-close') { e.preventDefault(); closeViewer(); return; }
+    if (t.id === 'img-viewer') { closeViewer(); return; }
     e.preventDefault();
-    _vd0 = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    _vs0 = _vs;
-  } else if (e.touches.length === 1) {
-    _vdrag = true; _vlx = e.touches[0].clientX; _vly = e.touches[0].clientY;
+    e.stopPropagation();
+    if (e.touches.length === 2) {
+      _vd0 = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+      _vs0 = _vs;
+    } else if (e.touches.length === 1) {
+      _vdrag = true; _vlx = e.touches[0].clientX; _vly = e.touches[0].clientY;
+    }
   }
-}, {passive:false, capture:true});
 
-document.addEventListener('touchmove', function(e) {
-  if (!document.getElementById('img-viewer').classList.contains('open')) return;
-  e.preventDefault();
-  if (e.touches.length === 2) {
-    const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    _vs = Math.min(5, Math.max(1, _vs0 * (d / _vd0)));
-    _vu();
-  } else if (e.touches.length === 1 && _vdrag && _vs > 1) {
-    _vx += e.touches[0].clientX - _vlx; _vy += e.touches[0].clientY - _vly;
-    _vlx = e.touches[0].clientX; _vly = e.touches[0].clientY;
-    _vu();
+  function onTM(e) {
+    if (!getViewer().classList.contains('open')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.touches.length === 2) {
+      const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+      _vs = Math.min(5, Math.max(1, _vs0 * (d / _vd0)));
+      _vu();
+    } else if (e.touches.length === 1 && _vdrag) {
+      _vx += e.touches[0].clientX - _vlx; _vy += e.touches[0].clientY - _vly;
+      _vlx = e.touches[0].clientX; _vly = e.touches[0].clientY;
+      _vu();
+    }
   }
-}, {passive:false, capture:true});
 
-document.addEventListener('touchend', function(e) {
-  if (!document.getElementById('img-viewer').classList.contains('open')) return;
-  _vdrag = false;
-  if (e.touches.length === 0 && _vs < 1.05) { _vs=1; _vx=0; _vy=0; _vu(); }
-}, {capture:true});
+  function onTE(e) {
+    if (!getViewer().classList.contains('open')) return;
+    _vdrag = false;
+    if (e.touches.length === 0 && _vs < 1.05) { _vs=1; _vx=0; _vy=0; _vu(); }
+  }
+
+  // Attach to both document and viewer for belt-and-suspenders
+  const opts = {passive:false, capture:true};
+  document.addEventListener('touchstart', onTS, opts);
+  document.addEventListener('touchmove',  onTM, opts);
+  document.addEventListener('touchend',   onTE, {capture:true});
+
+  // Also attach directly to viewer element (works when document listener is suppressed by PWA)
+  window.addEventListener('DOMContentLoaded', function() {
+    const v = getViewer();
+    v.addEventListener('touchstart', onTS, opts);
+    v.addEventListener('touchmove',  onTM, opts);
+    v.addEventListener('touchend',   onTE, {capture:true});
+  });
+})();
 
 // ── LOADING ─────────────────────────────────────────
 function hideLoading() {
