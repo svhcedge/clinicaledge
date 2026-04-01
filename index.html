@@ -380,34 +380,36 @@ async function handleSplashEnter() {
   const btn = document.getElementById('splash-btn');
   btn.textContent = 'Loading…'; btn.disabled = true;
 
-  // Check if user is blocked and load their favorites
-  try {
-    const res  = await fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`);
-    const json = await res.json();
-    if (json.blocked) {
-      localStorage.removeItem('ce_user');
-      localStorage.removeItem('ce_favs');
-      showScreen('screen-register');
-      showRegError('Your access has been revoked. Please contact the administrator.');
-      btn.textContent = 'Enter'; btn.disabled = false;
-      return;
-    }
-    // Load latest favorites from server
-    if (json.favorites !== undefined) {
-      const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
-      saveFavs(favArr);
-    } else {
-      await loadFavsFromServer(user.email);
-    }
-  } catch(e) {
-    console.warn('Backend unreachable, using local favs:', e);
-  }
-
+  // Load content first — show home screen immediately
   if (!allContent.length) await loadAllContent().catch(() => {});
   renderTiles();
   updateHomeGreeting();
   showScreen('screen-home');
   btn.textContent = 'Enter'; btn.disabled = false;
+
+  // Check blocked + sync favorites silently in background AFTER showing home
+  if (APPS_URL) {
+    fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`)
+      .then(r => r.json())
+      .then(json => {
+        if (json.blocked) {
+          localStorage.removeItem('ce_user');
+          localStorage.removeItem('ce_favs');
+          showScreen('screen-splash');
+          document.getElementById('splash-tagline').style.display = 'block';
+          document.getElementById('splash-greeting').classList.remove('show');
+          alert('Your access has been revoked. Please contact the administrator.');
+          return;
+        }
+        // Sync favorites in background
+        if (json.favorites !== undefined) {
+          const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
+          localStorage.setItem('ce_favs', JSON.stringify(favArr));
+          renderTiles(); // refresh tile counts
+        }
+      })
+      .catch(() => {}); // silent fail — local favs used
+  }
 }
 
 // ── USER STORAGE ────────────────────────────────────
@@ -712,7 +714,8 @@ function openContent(id) {
     const src = driveURL(item.imageUrl);
     imgWrap.innerHTML = `<img src="${src}" alt="${item.title}" loading="lazy" onclick="openViewer(this.src)" onerror="this.parentElement.innerHTML='<div class=\\'img-placeholder\\'>Image could not be loaded.</div>'">`;
   } else {
-    imgWrap.innerHTML = '<div class="img-placeholder">No image added yet.</div>';
+    imgWrap.innerHTML = '';
+    imgWrap.style.display = 'none';
   }
 
   // Explanation text
