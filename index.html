@@ -88,6 +88,8 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .topbar-title{font-size:16px;font-weight:500;color:var(--white);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* STAR BUTTON */
+.icon-btn{background:none;border:none;color:var(--purple3);font-size:20px;cursor:pointer;padding:4px 6px;flex-shrink:0;transition:transform .3s}
+.icon-btn:active{transform:rotate(180deg)}
 .logout-btn{background:rgba(124,58,237,0.15);border:1px solid var(--border2);border-radius:20px;color:var(--purple3);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;padding:5px 12px;flex-shrink:0;transition:background .2s}
 .logout-btn:hover{background:rgba(124,58,237,0.25)}
 .star-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:4px 0 4px 8px;line-height:1;color:var(--muted);flex-shrink:0;transition:color .15s,transform .1s}
@@ -116,8 +118,8 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .tile:hover::before,.tile:active::before{opacity:1}
 .tile:hover{border-color:var(--purple2);transform:translateY(-2px)}
 .tile:active{transform:scale(.97)}
-.tile-icon{width:48px;height:48px;background:var(--purple-dim);border:1px solid var(--border2);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:36px;overflow:hidden}
-.tile-icon img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.tile-icon{width:72px;height:72px;background:var(--purple-dim);border:1px solid var(--border2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:40px;overflow:hidden}
+.tile-icon img{width:100%;height:100%;object-fit:cover;border-radius:16px}
 .tile-name{font-size:14px;font-weight:500;color:var(--white);line-height:1.3}
 .tile-count{font-size:11px;color:var(--muted);margin-top:4px}
 .home-feedback{font-size:12px;color:var(--muted);text-align:center;padding:20px 8px 8px;line-height:1.6}
@@ -223,7 +225,8 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   <div class="topbar">
     <div class="topbar-logo">Clinical<span>EDGE</span></div>
     <div id="home-greeting" style="font-size:12px;color:var(--muted);flex-shrink:0"></div>
-    <button class="logout-btn" id="logout-btn" onclick="handleLogout()" title="Logout" style="display:none">Logout</button>
+    <button class="icon-btn" id="refresh-btn" onclick="handleRefresh()" title="Refresh">&#8635;</button>
+    <button class="logout-btn" id="logout-btn" onclick="handleLogout(false)" title="Logout" style="display:none">Logout</button>
   </div>
   <div class="home-body">
     <div class="search-wrap">
@@ -304,22 +307,91 @@ const navStack = [];
 
 // ── BOOT ────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  showScreen('screen-splash');
-  hideLoading();
   const user = getUser();
   if (user) {
-    document.getElementById('splash-tagline').style.display = 'none';
-    document.getElementById('splash-greeting').classList.add('show');
-    document.getElementById('splash-name').textContent = user.first;
-    loadAllContent().catch(() => {});
+    // Returning user — go straight to home, no splash
+    loadAllContent().then(() => {
+      renderTiles();
+      updateHomeGreeting();
+      _showDirectHome();
+    }).catch(() => {
+      renderTiles();
+      updateHomeGreeting();
+      _showDirectHome();
+    });
+    // Background checks
+    checkUserInBackground(user.email);
+  } else {
+    // First time — show splash
+    showScreen('screen-splash');
   }
+  hideLoading();
 });
+
+function _showDirectHome() {
+  // Show home without pushing to navStack so back button does nothing
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-home').classList.add('active');
+  window.scrollTo(0, 0);
+  navStack.length = 0;
+  navStack.push('screen-home');
+  history.replaceState({s:'screen-home'}, '');
+}
 
 // Device back button
 window.addEventListener('popstate', () => { navBack(); });
 
 // ── LOGOUT ───────────────────────────────────────────
-function handleLogout() {
+async function handleRefresh() {
+  const btn = document.getElementById('refresh-btn');
+  if (btn) { btn.style.animation = 'spin .6s linear'; setTimeout(() => btn.style.animation = '', 700); }
+  // Reload content from sheet
+  await loadAllContent().catch(() => {});
+  renderTiles();
+  // Sync favorites from server
+  const user = getUser();
+  if (user && APPS_URL) {
+    fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`)
+      .then(r => r.json())
+      .then(json => {
+        if (json.favorites !== undefined) {
+          const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
+          localStorage.setItem('ce_favs', JSON.stringify(favArr));
+          renderTiles();
+        }
+      }).catch(() => {});
+  }
+}
+
+function checkUserInBackground(email) {
+  if (!APPS_URL) return;
+  const lastCheck = localStorage.getItem('ce_last_check');
+  const now = Date.now();
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  if (lastCheck && (now - parseInt(lastCheck)) < ONE_DAY) return; // checked recently
+  fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(email)}`)
+    .then(r => r.json())
+    .then(json => {
+      localStorage.setItem('ce_last_check', String(now));
+      if (json.blocked) {
+        localStorage.removeItem('ce_user');
+        localStorage.removeItem('ce_favs');
+        localStorage.removeItem('ce_last_check');
+        // Kick out gracefully
+        alert('Your access has been revoked. Please contact the administrator.');
+        handleLogout(true);
+        return;
+      }
+      if (json.favorites !== undefined) {
+        const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
+        localStorage.setItem('ce_favs', JSON.stringify(favArr));
+        renderTiles();
+      }
+    })
+    .catch(() => {});
+}
+
+function handleLogout(forced) {
   if (!confirm('Log out of ClinicalEDGE?')) return;
   localStorage.removeItem('ce_user');
   localStorage.removeItem('ce_favs');
@@ -355,11 +427,12 @@ function showScreen(id) {
 }
 
 function navBack() {
-  // Pop current screen
   navStack.pop();
-  if (navStack.length === 0) {
-    // Nothing to go back to — stay on splash
-    _activateScreen('screen-splash');
+  if (navStack.length === 0 || navStack[navStack.length-1] === 'screen-home') {
+    // Home is the floor — no going back further
+    navStack.length = 0;
+    navStack.push('screen-home');
+    _activateScreen('screen-home');
     return;
   }
   const prev = navStack[navStack.length - 1];
@@ -387,29 +460,8 @@ async function handleSplashEnter() {
   showScreen('screen-home');
   btn.textContent = 'Enter'; btn.disabled = false;
 
-  // Check blocked + sync favorites silently in background AFTER showing home
-  if (APPS_URL) {
-    fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`)
-      .then(r => r.json())
-      .then(json => {
-        if (json.blocked) {
-          localStorage.removeItem('ce_user');
-          localStorage.removeItem('ce_favs');
-          showScreen('screen-splash');
-          document.getElementById('splash-tagline').style.display = 'block';
-          document.getElementById('splash-greeting').classList.remove('show');
-          alert('Your access has been revoked. Please contact the administrator.');
-          return;
-        }
-        // Sync favorites in background
-        if (json.favorites !== undefined) {
-          const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
-          localStorage.setItem('ce_favs', JSON.stringify(favArr));
-          renderTiles(); // refresh tile counts
-        }
-      })
-      .catch(() => {}); // silent fail — local favs used
-  }
+  // Check blocked + sync favorites once per day in background
+  checkUserInBackground(user.email);
 }
 
 // ── USER STORAGE ────────────────────────────────────
@@ -744,11 +796,10 @@ function openContent(id) {
 }
 
 function goHome() {
-  // Clear nav stack and go directly to home
   navStack.length = 0;
   navStack.push('screen-home');
   _activateScreen('screen-home');
-  history.pushState({s:'screen-home'}, '');
+  history.replaceState({s:'screen-home'}, '');
 }
 
 function toggleExplanation() {
