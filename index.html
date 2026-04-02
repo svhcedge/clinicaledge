@@ -324,23 +324,18 @@ const navStack = [];
 window.addEventListener('DOMContentLoaded', () => {
   const user = getUser();
   if (user) {
-    // Returning user — go straight to home, no splash
-    loadAllContent().then(() => {
-      renderTiles();
-      updateHomeGreeting();
-      _showDirectHome();
-    }).catch(() => {
-      renderTiles();
-      updateHomeGreeting();
-      _showDirectHome();
-    });
-    // Background checks
+    // Show home IMMEDIATELY — don't wait for content
+    updateHomeGreeting();
+    _showDirectHome();
+    hideLoading();
+    // Load content in background after showing home
+    loadAllContent().then(() => renderTiles()).catch(() => renderTiles());
     checkUserInBackground(user.email);
   } else {
     // First time — show splash
     showScreen('screen-splash');
+    hideLoading();
   }
-  hideLoading();
 });
 
 function _showDirectHome() {
@@ -1032,4 +1027,14 @@ function _vu() {
 })();
 
 // ── LOADING ─────────────────────────────────────────
-function 
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.add('hidden');
+}
+
+// ── SERVICE WORKER ───────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
