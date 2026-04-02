@@ -657,104 +657,64 @@ function renderMedia(url, title, container) {
     container.style.display = 'none';
     return;
   }
-  const src = driveURL(url);
-  const videoCheck = isVideoURL(url);
 
-  if (videoCheck === true) {
-    // Definitely a video
-    renderVideoPlayer(src, container);
-  } else if (videoCheck === 'maybe') {
-    // Google Drive — try as image first, fall back to video player on error
-    container.style.display = 'flex';
-    container.className = 'content-img-wrap';
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = title;
-    img.loading = 'lazy';
-    img.style.cursor = 'zoom-in';
-    img.onclick = () => openViewer(img.src);
-    img.onerror = () => {
-      // Image failed — try as video
-      container.className = '';
-      container.style.display = 'block';
-      renderVideoPlayer(src.replace('thumbnail?id=','file/d/').replace('&sz=w1600','/preview'), container);
-    };
-    container.innerHTML = '';
-    container.appendChild(img);
-  } else {
-    // Regular image
-    container.className = 'content-img-wrap';
-    container.style.display = 'flex';
-    container.innerHTML = `<img src="${src}" alt="${title}" loading="lazy" style="cursor:zoom-in"
-      onclick="openViewer(this.src)"
-      onerror="this.parentElement.style.display='none'">`;
+  // Detect video by file extension in URL
+  const lower = url.toLowerCase();
+  const isVideo = /\.(mp4|mov|avi|webm|mkv|m4v|wmv)([?#]|$)/.test(lower);
+
+  if (isVideo) {
+    renderVideoPlayer(url, container);
+    return;
   }
+
+  // For Google Drive links — try as image, fall back to video embed on error
+  const src = driveURL(url);
+  container.className = 'content-img-wrap';
+  container.style.display = 'flex';
+  container.style.paddingBottom = '';
+  container.style.height = '';
+  container.style.position = '';
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = title;
+  img.loading = 'lazy';
+  img.style.cssText = 'width:100%;height:auto;display:block;cursor:zoom-in';
+  img.onclick = () => openViewer(img.src);
+  img.onerror = () => {
+    // Image load failed — treat as video
+    renderVideoPlayer(url, container);
+  };
+  container.innerHTML = '';
+  container.appendChild(img);
 }
 
 function renderVideoPlayer(src, container) {
-  // Use Drive preview embed for Google Drive videos
-  const isDrive = src.includes('drive.google.com');
-  const videoSrc = isDrive
-    ? src.replace('/thumbnail?', '/uc?export=download&').replace('&sz=w1600','')
+  // Extract file ID for Google Drive embed
+  const m = src.match(/\/d\/([a-zA-Z0-9_-]+)/) || src.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  const embedSrc = m
+    ? `https://drive.google.com/file/d/${m[1]}/preview`
     : src;
 
   container.className = 'video-wrap';
   container.style.display = 'block';
+  // padding-bottom creates 16:9 aspect ratio
+  container.style.position = 'relative';
+  container.style.paddingBottom = '56.25%';
+  container.style.height = '0';
+  container.style.overflow = 'hidden';
+  container.style.borderRadius = 'var(--radius)';
+  container.style.border = '1px solid var(--border)';
+  container.style.background = '#000';
+  container.style.marginBottom = '16px';
+
   container.innerHTML = `
-    <video id="main-video" preload="metadata" playsinline webkit-playsinline>
-      <source src="${videoSrc}" type="video/mp4">
-    </video>
-    <div class="video-tap-hint">Tap to play</div>
-    <div class="video-controls">
-      <button class="vid-btn" id="vid-play-btn" onclick="vidToggle()">&#9654;</button>
-      <div class="vid-progress" id="vid-progress" onclick="vidSeek(event)">
-        <div class="vid-progress-fill" id="vid-fill"></div>
-      </div>
-      <span class="vid-time" id="vid-time">0:00</span>
-      <button class="vid-btn" onclick="vidStop()">&#9632;</button>
-    </div>`;
-
-  const video = container.querySelector('video');
-  const wrap  = container;
-
-  // Tap video area to play/pause
-  video.addEventListener('click', vidToggle);
-  container.querySelector('.video-tap-hint').addEventListener('click', vidToggle);
-
-  video.addEventListener('timeupdate', () => {
-    const pct = video.duration ? (video.currentTime / video.duration * 100) : 0;
-    const fill = document.getElementById('vid-fill');
-    const time = document.getElementById('vid-time');
-    if (fill) fill.style.width = pct + '%';
-    if (time) time.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
-  });
-  video.addEventListener('play',  () => { wrap.classList.add('playing'); document.getElementById('vid-play-btn').innerHTML='&#9646;&#9646;'; });
-  video.addEventListener('pause', () => { wrap.classList.remove('playing'); document.getElementById('vid-play-btn').innerHTML='&#9654;'; });
-  video.addEventListener('ended', () => { wrap.classList.remove('playing'); document.getElementById('vid-play-btn').innerHTML='&#9654;'; });
-}
-
-function vidToggle() {
-  const v = document.getElementById('main-video');
-  if (!v) return;
-  v.paused ? v.play() : v.pause();
-}
-function vidStop() {
-  const v = document.getElementById('main-video');
-  if (!v) return;
-  v.pause(); v.currentTime = 0;
-}
-function vidSeek(e) {
-  const v = document.getElementById('main-video');
-  const bar = document.getElementById('vid-progress');
-  if (!v || !bar || !v.duration) return;
-  const rect = bar.getBoundingClientRect();
-  const pct  = (e.clientX - rect.left) / rect.width;
-  v.currentTime = pct * v.duration;
-}
-function fmtTime(s) {
-  if (!s || isNaN(s)) return '0:00';
-  const m = Math.floor(s/60), ss = Math.floor(s%60);
-  return m + ':' + String(ss).padStart(2,'0');
+    <iframe
+      src="${embedSrc}"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
+      allow="autoplay"
+      allowfullscreen
+    ></iframe>`;
 }
 
 // ── FAVORITES ───────────────────────────────────────
