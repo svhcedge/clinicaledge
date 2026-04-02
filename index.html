@@ -24,7 +24,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-height:100vh;overflow-x:hidden}
-body{visibility:hidden}
 .screen{display:none;flex-direction:column;min-height:100vh}
 .screen.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -351,7 +350,6 @@ function _showDirectHome() {
   navStack.length = 0;
   navStack.push('screen-home');
   history.replaceState({s:'screen-home'}, '');
-  document.body.style.visibility = 'visible';
 }
 
 // Device back button
@@ -439,7 +437,6 @@ function showScreen(id) {
   window.scrollTo(0, 0);
   navStack.push(id);
   history.pushState({s: id}, '');
-  document.body.style.visibility = 'visible';
 }
 
 function navBack() {
