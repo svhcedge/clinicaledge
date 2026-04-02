@@ -24,13 +24,14 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-height:100vh;overflow-x:hidden}
-.screen{display:none;flex-direction:column;min-height:100vh;animation:fadeIn .3s ease}
+body{visibility:hidden}
+.screen{display:none;flex-direction:column;min-height:100vh}
 .screen.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes floatUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 
 /* LOADING */
-#loading-overlay{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .4s}
+#loading-overlay{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 #loading-overlay.hidden{display:none}
 .loading-logo{font-size:28px;font-weight:600;color:var(--white);letter-spacing:-.5px}
 .loading-logo span{color:var(--purple3)}
@@ -322,6 +323,7 @@ const navStack = [];
 
 // ── BOOT ────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  document.body.style.visibility = 'visible';
   const user = getUser();
   if (user) {
     // Returning user — go straight to home, no splash
@@ -689,32 +691,57 @@ function renderMedia(url, title, container) {
   container.appendChild(img);
 }
 
-function renderVideoPlayer(src, container) {
-  // Extract file ID for Google Drive embed
-  const m = src.match(/\/d\/([a-zA-Z0-9_-]+)/) || src.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  const embedSrc = m
-    ? `https://drive.google.com/file/d/${m[1]}/preview`
-    : src;
+function renderVideoPlayer(url, container) {
+  // Extract Google Drive file ID
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  const fileId = m ? m[1] : null;
 
+  // Reset container styles
   container.className = 'video-wrap';
-  container.style.display = 'block';
-  // padding-bottom creates 16:9 aspect ratio
-  container.style.position = 'relative';
-  container.style.paddingBottom = '56.25%';
-  container.style.height = '0';
-  container.style.overflow = 'hidden';
-  container.style.borderRadius = 'var(--radius)';
-  container.style.border = '1px solid var(--border)';
-  container.style.background = '#000';
-  container.style.marginBottom = '16px';
+  container.style.cssText = 'display:block;position:relative;border-radius:var(--radius);border:1px solid var(--border);background:#000;margin-bottom:16px;overflow:hidden';
 
-  container.innerHTML = `
-    <iframe
-      src="${embedSrc}"
-      style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
-      allow="autoplay"
-      allowfullscreen
-    ></iframe>`;
+  if (fileId) {
+    // Try multiple Drive URL formats — uc?export=view works for most video formats
+    const streamUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+
+    container.innerHTML = `
+      <div style="position:relative">
+        <video
+          id="main-video"
+          controls
+          playsinline
+          webkit-playsinline
+          preload="metadata"
+          style="width:100%;height:auto;display:block;max-height:70vh;background:#000"
+          onerror="this.parentElement.parentElement.innerHTML=renderDriveFallback('${previewUrl}')"
+        >
+          <source src="${streamUrl}" type="video/mp4">
+          <source src="${streamUrl}" type="video/quicktime">
+        </video>
+        <div class="video-tap-hint" id="vid-hint" style="pointer-events:none">Tap to play</div>
+      </div>`;
+
+    const vid = container.querySelector('video');
+    if (vid) {
+      vid.addEventListener('play',  () => { const h = document.getElementById('vid-hint'); if(h) h.style.opacity='0'; });
+      vid.addEventListener('pause', () => { const h = document.getElementById('vid-hint'); if(h) h.style.opacity='1'; });
+    }
+  } else {
+    // Non-Drive video
+    container.innerHTML = `
+      <video controls playsinline webkit-playsinline preload="metadata"
+        style="width:100%;height:auto;display:block;max-height:70vh">
+        <source src="${url}" type="video/mp4">
+        <source src="${url}" type="video/quicktime">
+      </video>`;
+  }
+}
+
+function renderDriveFallback(previewUrl) {
+  return `<iframe src="${previewUrl}"
+    style="width:100%;height:320px;border:none"
+    allow="autoplay" allowfullscreen></iframe>`;
 }
 
 // ── FAVORITES ───────────────────────────────────────
@@ -1033,9 +1060,7 @@ function _vu() {
 
 // ── LOADING ─────────────────────────────────────────
 function hideLoading() {
-  const ol = document.getElementById('loading-overlay');
-  ol.style.opacity = '0';
-  setTimeout(() => ol.classList.add('hidden'), 400);
+  document.getElementById('loading-overlay').classList.add('hidden');
 }
 
 // ── SERVICE WORKER ───────────────────────────────────
