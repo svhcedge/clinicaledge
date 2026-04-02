@@ -167,6 +167,20 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 #img-viewer-close{position:absolute;top:72px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 #img-viewer-img{max-width:100vw;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;will-change:transform;touch-action:none;user-select:none;-webkit-user-select:none}
 
+
+/* Video player */
+.video-wrap{width:100%;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:#000;margin-bottom:16px;position:relative;cursor:pointer}
+.video-wrap video{width:100%;height:auto;display:block;max-height:70vh}
+.video-tap-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.55);color:#fff;font-size:13px;font-weight:500;padding:8px 16px;border-radius:20px;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+.video-wrap.playing .video-tap-hint{opacity:0}
+.video-controls{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(0,0,0,0.7);position:absolute;bottom:0;left:0;right:0;transition:opacity .3s}
+.video-wrap.controls-hidden .video-controls{opacity:0}
+.vid-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0}
+.vid-btn:active{opacity:.7}
+.vid-progress{flex:1;height:4px;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;position:relative}
+.vid-progress-fill{height:100%;background:var(--purple2);border-radius:2px;width:0%;transition:width .1s linear}
+.vid-time{font-size:11px;color:rgba(255,255,255,.7);white-space:nowrap;min-width:60px;text-align:right}
+
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
@@ -299,6 +313,7 @@ let allContent         = [];
 let sheetTabs          = [];
 let fuse               = null;
 let explanationVisible = false;
+let prevCategoryTab    = null;
 let currentItemId      = null;
 
 // Navigation stack — tracks screen history for back button
@@ -552,13 +567,15 @@ async function fetchTabContent(tabName) {
     const gi = ci('tags');
     const ei = ci('explanation_images');
     const qi = ci('question');
+    const si = ci('subcategory');
+    const li = ci('subcategory_logo');
     return rows.slice(1).map((cols, idx) => {
       const v = i => (i >= 0 && cols[i] != null) ? csvVal(cols[i]) : '';
       const title = v(ti);
       if (!title) return null;
       const expRaw = v(ei);
       const expImages = expRaw ? expRaw.split(',').map(u => u.trim()).filter(Boolean) : [];
-      return { id:`${tabName}__${idx}`, category:tabName, title, body:v(bi), imageUrl:v(ii), tags:v(gi), expImages, question:v(qi) };
+      return { id:`${tabName}__${idx}`, category:tabName, title, body:v(bi), imageUrl:v(ii), tags:v(gi), expImages, question:v(qi), subcategory:v(si), subcategoryLogo:v(li) };
     }).filter(Boolean);
   } catch(e) { return []; }
 }
@@ -608,20 +625,136 @@ async function loadAllContent() {
 }
 
 // ── DRIVE URL ───────────────────────────────────────
+function isVideoURL(url) {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  // Common video extensions
+  if (/\.(mp4|mov|avi|webm|mkv|m4v)([?#]|$)/.test(lower)) return true;
+  // Google Drive video links often have these patterns
+  if (lower.includes('drive.google.com') && lower.includes('/file/d/')) {
+    // We'll detect by trying — handled in renderMedia
+    return 'maybe';
+  }
+  return false;
+}
+
 function driveURL(url) {
   if (!url) return '';
   url = url.trim();
-  // Extract file ID from any Google Drive share URL format
   let id = null;
   const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (m1) id = m1[1];
   else if (m2) id = m2[1];
-  if (id) {
-    // lh3 worked reliably before — use it as primary, thumbnail as fallback
-    return `https://lh3.googleusercontent.com/d/${id}`;
-  }
+  if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1600`;
   return url;
+}
+
+// ── MEDIA RENDERER ───────────────────────────────────
+function renderMedia(url, title, container) {
+  if (!url) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+  const src = driveURL(url);
+  const videoCheck = isVideoURL(url);
+
+  if (videoCheck === true) {
+    // Definitely a video
+    renderVideoPlayer(src, container);
+  } else if (videoCheck === 'maybe') {
+    // Google Drive — try as image first, fall back to video player on error
+    container.style.display = 'flex';
+    container.className = 'content-img-wrap';
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = title;
+    img.loading = 'lazy';
+    img.style.cursor = 'zoom-in';
+    img.onclick = () => openViewer(img.src);
+    img.onerror = () => {
+      // Image failed — try as video
+      container.className = '';
+      container.style.display = 'block';
+      renderVideoPlayer(src.replace('thumbnail?id=','file/d/').replace('&sz=w1600','/preview'), container);
+    };
+    container.innerHTML = '';
+    container.appendChild(img);
+  } else {
+    // Regular image
+    container.className = 'content-img-wrap';
+    container.style.display = 'flex';
+    container.innerHTML = `<img src="${src}" alt="${title}" loading="lazy" style="cursor:zoom-in"
+      onclick="openViewer(this.src)"
+      onerror="this.parentElement.style.display='none'">`;
+  }
+}
+
+function renderVideoPlayer(src, container) {
+  // Use Drive preview embed for Google Drive videos
+  const isDrive = src.includes('drive.google.com');
+  const videoSrc = isDrive
+    ? src.replace('/thumbnail?', '/uc?export=download&').replace('&sz=w1600','')
+    : src;
+
+  container.className = 'video-wrap';
+  container.style.display = 'block';
+  container.innerHTML = `
+    <video id="main-video" preload="metadata" playsinline webkit-playsinline>
+      <source src="${videoSrc}" type="video/mp4">
+    </video>
+    <div class="video-tap-hint">Tap to play</div>
+    <div class="video-controls">
+      <button class="vid-btn" id="vid-play-btn" onclick="vidToggle()">&#9654;</button>
+      <div class="vid-progress" id="vid-progress" onclick="vidSeek(event)">
+        <div class="vid-progress-fill" id="vid-fill"></div>
+      </div>
+      <span class="vid-time" id="vid-time">0:00</span>
+      <button class="vid-btn" onclick="vidStop()">&#9632;</button>
+    </div>`;
+
+  const video = container.querySelector('video');
+  const wrap  = container;
+
+  // Tap video area to play/pause
+  video.addEventListener('click', vidToggle);
+  container.querySelector('.video-tap-hint').addEventListener('click', vidToggle);
+
+  video.addEventListener('timeupdate', () => {
+    const pct = video.duration ? (video.currentTime / video.duration * 100) : 0;
+    const fill = document.getElementById('vid-fill');
+    const time = document.getElementById('vid-time');
+    if (fill) fill.style.width = pct + '%';
+    if (time) time.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+  });
+  video.addEventListener('play',  () => { wrap.classList.add('playing'); document.getElementById('vid-play-btn').innerHTML='&#9646;&#9646;'; });
+  video.addEventListener('pause', () => { wrap.classList.remove('playing'); document.getElementById('vid-play-btn').innerHTML='&#9654;'; });
+  video.addEventListener('ended', () => { wrap.classList.remove('playing'); document.getElementById('vid-play-btn').innerHTML='&#9654;'; });
+}
+
+function vidToggle() {
+  const v = document.getElementById('main-video');
+  if (!v) return;
+  v.paused ? v.play() : v.pause();
+}
+function vidStop() {
+  const v = document.getElementById('main-video');
+  if (!v) return;
+  v.pause(); v.currentTime = 0;
+}
+function vidSeek(e) {
+  const v = document.getElementById('main-video');
+  const bar = document.getElementById('vid-progress');
+  if (!v || !bar || !v.duration) return;
+  const rect = bar.getBoundingClientRect();
+  const pct  = (e.clientX - rect.left) / rect.width;
+  v.currentTime = pct * v.duration;
+}
+function fmtTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s/60), ss = Math.floor(s%60);
+  return m + ':' + String(ss).padStart(2,'0');
 }
 
 // ── FAVORITES ───────────────────────────────────────
@@ -712,9 +845,68 @@ function handleSearch(query) {
 
 // ── CATEGORY LIST ───────────────────────────────────
 function openCategory(tabName) {
-  document.getElementById('cat-screen-title').textContent = tabName;
   const items = allContent.filter(c => c.category === tabName);
-  const list  = document.getElementById('content-list');
+
+  // Check if any items have subcategories
+  const hasSubcats = items.some(c => c.subcategory);
+
+  if (hasSubcats) {
+    // Show subcategory tiles instead of list
+    openSubcategoryTiles(tabName, items);
+  } else {
+    // Show normal list
+    openCategoryList(tabName, items);
+  }
+}
+
+function openSubcategoryTiles(tabName, items) {
+  document.getElementById('cat-screen-title').textContent = tabName;
+  const list = document.getElementById('content-list');
+
+  // Group items by subcategory
+  const groups = {};
+  const groupLogos = {};
+  items.forEach(item => {
+    const sub = item.subcategory || '(Other)';
+    if (!groups[sub]) groups[sub] = [];
+    groups[sub].push(item);
+    if (item.subcategoryLogo && !groupLogos[sub]) {
+      groupLogos[sub] = driveURL(item.subcategoryLogo);
+    }
+  });
+
+  // Build subcategory tile grid
+  const subNames = Object.keys(groups);
+  const ICON_FALLBACKS = ['🫀','🩻','🧠','🦟','🔬','📄','💊','🩺','📊','🧬','💉','📋'];
+
+  list.innerHTML = `<div id="subcat-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:4px 0">${
+    subNames.map((sub, idx) => {
+      const count = groups[sub].length;
+      const logo  = groupLogos[sub];
+      const iconHtml = logo
+        ? `<div class="tile-icon"><img src="${logo}" alt="${sub}" onerror="this.parentElement.textContent='${ICON_FALLBACKS[idx % ICON_FALLBACKS.length]}'"></div>`
+        : `<div class="tile-icon">${ICON_FALLBACKS[idx % ICON_FALLBACKS.length]}</div>`;
+      return `<div class="tile" onclick="openSubcategoryList('${tabName}','${sub.replace(/'/g,"\'")}')">
+        ${iconHtml}
+        <div class="tile-name">${sub}</div>
+        <div class="tile-count">${count} item${count!==1?'s':''}</div>
+      </div>`;
+    }).join('')
+  }</div>`;
+
+  prevCategoryTab = tabName;
+  showScreen('screen-category');
+}
+
+function openSubcategoryList(tabName, subName) {
+  const items = allContent.filter(c => c.category === tabName && c.subcategory === subName);
+  document.getElementById('cat-screen-title').textContent = subName;
+  openCategoryList(subName, items, tabName);
+}
+
+function openCategoryList(displayName, items, parentTab) {
+  document.getElementById('cat-screen-title').textContent = displayName;
+  const list = document.getElementById('content-list');
   list.innerHTML = items.length
     ? items.map((item,i)=>`
         <div class="content-list-item" onclick="openContent('${item.id}')">
@@ -760,17 +952,11 @@ function openContent(id) {
   if (item.question) { qText.textContent = item.question; qBox.style.display = 'block'; }
   else { qBox.style.display = 'none'; }
 
-  // Main image
+    // Media — image, gif or video
   const imgWrap = document.getElementById('content-img-wrap');
-  if (item.imageUrl) {
-    const src = driveURL(item.imageUrl);
-    imgWrap.innerHTML = `<img src="${src}" alt="${item.title}" loading="lazy" onclick="openViewer(this.src)" onerror="this.parentElement.innerHTML='<div class=\\'img-placeholder\\'>Image could not be loaded.</div>'">`;
-  } else {
-    imgWrap.innerHTML = '';
-    imgWrap.style.display = 'none';
-  }
+  renderMedia(item.imageUrl, item.title, imgWrap);
 
-  // Explanation text
+    // Explanation text
   document.getElementById('explanation-text').textContent = item.body || '';
 
   // Explanation images
