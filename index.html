@@ -23,6 +23,7 @@
   --radius:16px;--radius-sm:10px;--font:'DM Sans',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+.screen:not(.active) *{pointer-events:none}
 html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-height:100vh;overflow-x:hidden}
 .screen{display:none;flex-direction:column;min-height:100vh}
 .screen.active{display:flex}
@@ -106,18 +107,26 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 #search-input:focus{border-color:var(--purple2)}
 #search-results{display:none}
 #search-results.visible{display:block}
-.search-result-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.search-result-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:border-color .1s,background .1s;-webkit-tap-highlight-color:transparent}
 .search-result-item:hover{border-color:var(--purple);background:var(--purple-dim)}
 .search-result-cat{font-size:10px;font-weight:600;color:var(--purple3);background:var(--purple-dim);border-radius:4px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
 .search-result-title{font-size:14px;color:var(--white);flex:1}
 .search-empty{text-align:center;padding:32px 0;color:var(--muted);font-size:14px}
 .tiles-label{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.5px;margin-bottom:12px}
 #tiles-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.tile{aspect-ratio:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:16px;transition:border-color .2s,background .2s,transform .15s;text-align:center;position:relative;overflow:hidden}
+.tile{aspect-ratio:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:16px;transition:border-color .1s,background .1s,transform .1s;text-align:center;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
 .tile::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--purple-glow),transparent 70%);opacity:0;transition:opacity .2s}
 .tile:hover::before,.tile:active::before{opacity:1}
 .tile:hover{border-color:var(--purple2);transform:translateY(-2px)}
 .tile:active{transform:scale(.97)}
+/* Prevent sticky hover state on touch devices after navigation */
+@media (hover: none) {
+  .tile:hover{border-color:var(--border);transform:none;background:var(--bg3)}
+  .tile:hover::before{opacity:0}
+  .content-list-item:hover{border-color:var(--border);background:var(--bg3)}
+  .search-result-item:hover{border-color:var(--border);background:var(--bg3)}
+}
+.tile.no-transition,.content-list-item.no-transition{transition:none}
 .tile-icon{width:72px;height:72px;background:var(--purple-dim);border:1px solid var(--border2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:40px;overflow:hidden}
 .tile-icon img{width:100%;height:100%;object-fit:cover;border-radius:16px}
 .tile-name{font-size:14px;font-weight:500;color:var(--white);line-height:1.3}
@@ -132,7 +141,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 /* CATEGORY LIST */
 #screen-category{background:var(--bg)}
 .cat-body{flex:1;padding:16px}
-.content-list-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.content-list-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:border-color .1s,background .1s;-webkit-tap-highlight-color:transparent}
 .content-list-item:hover{border-color:var(--purple);background:var(--purple-dim)}
 .content-list-num{font-size:12px;color:var(--muted);min-width:24px}
 .content-list-title{font-size:14px;color:var(--white);flex:1;line-height:1.4}
@@ -251,7 +260,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <div id="tiles-section">
       <div class="tiles-label">CATEGORIES</div>
       <div id="tiles-grid"></div>
-      <div class="home-feedback">Please email any feedback, questions or concerns regarding the app to <a href="/cdn-cgi/l/email-protection#1764617f747273707257707a767e7b3974787a"><span class="__cf_email__" data-cfemail="1e6d68767d7b7a797b5e79737f7772307d7173">[email&#160;protected]</span></a></div>
+      <div class="home-feedback">For feedback, questions or concerns, email us at svhcedge@gmail.com</div>
     </div>
   </div>
 </div>
@@ -296,7 +305,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
       <div class="explanation-text" id="explanation-text"></div>
       <div class="explanation-images" id="explanation-images"></div>
     </div>
-    <div class="feedback-note">Please email any feedback, questions or concerns regarding the contents to <a href="/cdn-cgi/l/email-protection#72111f003201041a1f17160017011b16171c110b5c111d1f"><span class="__cf_email__" data-cfemail="ff9c928dbf8c8997929a9b8d9a8c969b9a919c86d19c9092">[email&#160;protected]</span></a></div>
+
   </div>
 </div>
 
@@ -339,6 +348,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function _showDirectHome() {
+  if (document.activeElement) document.activeElement.blur();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-home').classList.add('active');
   window.scrollTo(0, 0);
@@ -426,6 +436,12 @@ function updateHomeGreeting() {
 // ── SCREEN NAVIGATION ───────────────────────────────
 function showScreen(id) {
   if (id === 'screen-register' && getUser()) return;
+  // Clear lingering highlight states before switching
+  document.querySelectorAll('.tile, .content-list-item, .search-result-item').forEach(el => {
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.transform = '';
+  });
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
@@ -448,6 +464,12 @@ function navBack() {
 }
 
 function _activateScreen(id) {
+  // Clear any lingering hover/active highlight states
+  document.querySelectorAll('.tile, .content-list-item, .search-result-item').forEach(el => {
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.transform = '';
+  });
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
@@ -520,7 +542,17 @@ function showRegError(msg) {
 // _tabs sheet: column A = tab name, column B = category_logo (image URL, optional)
 let tabLogos = {}; // map of tabName -> logo URL
 
+// Cache icon URLs in localStorage so tiles render instantly on load
+function saveLogoCache(logos) {
+  try { localStorage.setItem('ce_logos', JSON.stringify(logos)); } catch(e) {}
+}
+function loadLogoCache() {
+  try { return JSON.parse(localStorage.getItem('ce_logos') || '{}'); } catch(e) { return {}; }
+}
+
 async function loadTabNames() {
+  // Pre-load from cache so icons are instant on repeat visits
+  tabLogos = loadLogoCache();
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TABS_SHEET)}`;
   try {
     const res  = await fetch(url);
@@ -537,6 +569,7 @@ async function loadTabNames() {
       tabs.push(name);
       if (logo) tabLogos[name] = driveURL(logo);
     }
+    saveLogoCache(tabLogos);
     return tabs;
   } catch(e) { return []; }
 }
@@ -660,24 +693,42 @@ function renderMedia(url, title, container) {
     return;
   }
 
-  // For Google Drive links — try as image, fall back to video embed on error
+  // Google Drive link — check if it's explicitly marked as video via sheet column
+  // OR if the URL is a /file/d/ share link (these are almost always videos when image_url is used)
+  const isDriveFile = /drive\.google\.com\/file\/d\//i.test(url);
   const src = driveURL(url);
+
+  if (isDriveFile) {
+    // Drive file links: try image first; if it loads show as image, else show as video tap
+    container.className = 'content-img-wrap';
+    container.style.display = 'flex';
+    container.style.paddingBottom = '';
+    container.style.height = '';
+    container.style.position = '';
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = title;
+    img.loading = 'lazy';
+    img.style.cssText = 'width:100%;height:auto;display:block;cursor:zoom-in';
+    img.onclick = () => openViewer(img.src);
+    img.onerror = () => { renderVideoPlayer(url, container); };
+    container.innerHTML = '';
+    container.appendChild(img);
+    return;
+  }
+
+  // Non-Drive URL — render as plain image
   container.className = 'content-img-wrap';
   container.style.display = 'flex';
   container.style.paddingBottom = '';
   container.style.height = '';
   container.style.position = '';
-
   const img = document.createElement('img');
-  img.src = src;
+  img.src = url;
   img.alt = title;
   img.loading = 'lazy';
   img.style.cssText = 'width:100%;height:auto;display:block;cursor:zoom-in';
   img.onclick = () => openViewer(img.src);
-  img.onerror = () => {
-    // Image load failed — treat as video
-    renderVideoPlayer(url, container);
-  };
   container.innerHTML = '';
   container.appendChild(img);
 }
@@ -685,31 +736,21 @@ function renderMedia(url, title, container) {
 function renderVideoPlayer(url, container) {
   const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   const fileId = m ? m[1] : null;
-  const embedSrc = fileId
-    ? `https://drive.google.com/file/d/${fileId}/preview`
-    : url;
+  // Use thumbnail as poster image, open video in browser on tap
+  const posterSrc = fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w800` : '';
+  const viewUrl   = fileId ? `https://drive.google.com/file/d/${fileId}/view` : url;
 
-  // 16:9 iframe embed — works for all formats including .mov
-  container.className = '';
-  container.style.cssText = `
-    display:block;
-    position:relative;
-    width:100%;
-    padding-bottom:56.25%;
-    height:0;
-    overflow:hidden;
-    border-radius:var(--radius);
-    border:1px solid var(--border);
-    background:#000;
-    margin-bottom:16px;
-  `;
-  container.innerHTML = `<iframe
-    src="${embedSrc}"
-    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:var(--radius)"
-    allow="autoplay; fullscreen"
-    allowfullscreen
-    loading="lazy"
-  ></iframe>`;
+  container.className = 'content-img-wrap';
+  container.style.cssText = 'display:flex;align-items:center;justify-content:center;position:relative;min-height:180px;margin-bottom:16px;cursor:pointer;background:#000;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)';
+
+  container.innerHTML = `
+    <img src="${posterSrc}" style="width:100%;height:auto;display:block;opacity:0.75" onerror="this.style.display='none'">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;font-size:12px;padding:4px 12px;border-radius:12px;white-space:nowrap">Tap to open video</div>`;
+
+  container.onclick = () => window.open(viewUrl, '_blank');
 }
 
 // ── FAVORITES ───────────────────────────────────────
@@ -757,7 +798,7 @@ function renderTiles() {
   if (!sheetTabs.length) {
     const msg = document.createElement('div');
     msg.className = 'status-msg';
-    msg.innerHTML = '<div class="status-icon">📋</div><div class="status-title">No categories found</div>Make sure your <code>_tabs</code> sheet has category names in column A.';
+    msg.innerHTML = '<div class="status-icon">🔄</div><div class="status-title">Content temporarily unavailable</div>We\'re experiencing a brief technical issue. Please tap &#8635; to try again.';
     grid.appendChild(msg);
   } else {
     sheetTabs.forEach((tab, idx) => {
@@ -904,7 +945,7 @@ function openContent(id) {
   // Question box — above image
   const qBox = document.getElementById('question-box');
   const qText = document.getElementById('question-text');
-  if (item.question) { qText.textContent = item.question; qBox.style.display = 'block'; }
+  if (item.question) { qText.innerHTML = item.question.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); qBox.style.display = 'block'; }
   else { qBox.style.display = 'none'; }
 
     // Media — image, gif or video
@@ -912,7 +953,18 @@ function openContent(id) {
   renderMedia(item.imageUrl, item.title, imgWrap);
 
     // Explanation text
-  document.getElementById('explanation-text').textContent = item.body || '';
+  // Render body text preserving paragraphs and bullet points from Google Sheets
+  const bodyEl = document.getElementById('explanation-text');
+  if (item.body) {
+    // Convert newlines to <br>, preserve bullet characters
+    bodyEl.innerHTML = item.body
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\n/g,'<br>');
+    bodyEl.style.display = '';
+  } else {
+    bodyEl.innerHTML = '';
+    bodyEl.style.display = 'none';
+  }
 
   // Explanation images
   const imgsEl = document.getElementById('explanation-images');
