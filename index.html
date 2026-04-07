@@ -223,7 +223,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <div id="tiles-section">
       <div class="tiles-label">CATEGORIES</div>
       <div id="tiles-grid"></div>
-      <div class="home-feedback">For feedback, questions or concerns, email us at svhcedge@gmail.com</div>
+      <div class="home-feedback">For feedback, questions or concerns, email us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="295a5f414a4c4d4e4c694e44484045074a4644">[email&#160;protected]</a></div>
     </div>
   </div>
 </div>
@@ -268,7 +268,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     </div>
   </div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── CONFIG ──────────────────────────────────────────
 const SHEET_ID         = '1gzTGUuVuUoW4MLApbZOkvYmSi7Z8ibbP7pWGAN3DTcg';
 const INSTITUTION_CODE = 'EDGE26';
@@ -282,14 +282,35 @@ let explanationVisible = false, prevCategoryTab = null, currentItemId = null;
 const navStack = [];
 
 // ── BOOT ────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const user = getUser();
   if (user) {
+    // Show home immediately for speed
     updateHomeGreeting();
     _showDirectHome();
     hideLoading();
     loadAllContent().then(() => renderTiles()).catch(() => renderTiles());
-    checkUserInBackground(user.email);
+    // Always check block status on every app open — no throttle on boot
+    if (APPS_URL) {
+      try {
+        const res  = await fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`);
+        const json = await res.json();
+        localStorage.setItem('ce_last_check', String(Date.now()));
+        if (json.blocked) {
+          ['ce_user','ce_favs','ce_last_check'].forEach(k => localStorage.removeItem(k));
+          alert('Your access has been revoked. Please contact the administrator.');
+          handleLogout(true);
+          return;
+        }
+        if (json.favorites !== undefined) {
+          localStorage.setItem('ce_favs', JSON.stringify(json.favorites ? json.favorites.split(',').filter(Boolean) : []));
+          renderTiles();
+        }
+      } catch(e) {
+        // Offline — still show home but run hourly background check
+        checkUserInBackground(user.email);
+      }
+    }
   } else {
     showScreen('screen-splash');
     hideLoading();
@@ -867,8 +888,4 @@ function _vu(){document.getElementById('img-viewer-img').style.transform=`transl
   });
 })();
 
-function hideLoading(){document.getElementById('loading-overlay').classList.add('hidden');}
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
-</script>
-</body>
-</html>
+function hideLoa
