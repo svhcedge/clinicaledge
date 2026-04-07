@@ -386,8 +386,8 @@ function checkUserInBackground(email) {
   if (!APPS_URL) return;
   const lastCheck = localStorage.getItem('ce_last_check');
   const now = Date.now();
-  const ONE_DAY = 24 * 60 * 60 * 1000;
-  if (lastCheck && (now - parseInt(lastCheck)) < ONE_DAY) return; // checked recently
+  const ONE_HOUR = 60 * 60 * 1000;
+  if (lastCheck && (now - parseInt(lastCheck)) < ONE_HOUR) return; // checked recently (every hour)
   fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(email)}`)
     .then(r => r.json())
     .then(json => {
@@ -411,16 +411,20 @@ function checkUserInBackground(email) {
 }
 
 function handleLogout(forced) {
-  if (!confirm('Log out of ClinicalEDGE?')) return;
+  if (!forced && !confirm('Log out of ClinicalEDGE?')) return;
   localStorage.removeItem('ce_user');
   localStorage.removeItem('ce_favs');
+  localStorage.removeItem('ce_last_check');
   // Reset nav stack
   navStack.length = 0;
   // Reset splash to first-time state
   document.getElementById('splash-tagline').style.display = 'block';
   document.getElementById('splash-greeting').classList.remove('show');
   document.getElementById('splash-name').textContent = '';
-  showScreen('screen-splash');
+  // Force to splash — no confirm needed for forced logout
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-splash').classList.add('active');
+  history.replaceState({s:'screen-splash'}, '');
 }
 
 function updateHomeGreeting() {
@@ -481,16 +485,44 @@ async function handleSplashEnter() {
   const user = getUser();
   if (!user) { showScreen('screen-register'); return; }
   const btn = document.getElementById('splash-btn');
-  btn.textContent = 'Loading…'; btn.disabled = true;
+  btn.textContent = 'Verifying…'; btn.disabled = true;
 
-  // Load content first — show home screen immediately
+  // ── BLOCK CHECK AT LOGIN ─────────────────────────────
+  // Always check blocked status when user explicitly taps Enter
+  // This prevents a blocked user from getting in after logout
+  if (APPS_URL) {
+    try {
+      const res  = await fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`);
+      const json = await res.json();
+      if (json.blocked) {
+        // Clear everything and refuse entry
+        localStorage.removeItem('ce_user');
+        localStorage.removeItem('ce_favs');
+        localStorage.removeItem('ce_last_check');
+        btn.textContent = 'Enter'; btn.disabled = false;
+        alert('Your access has been revoked. Please contact the administrator.');
+        return; // Stay on splash — do NOT proceed
+      }
+      // Sync favorites from server while we're here
+      if (json.favorites !== undefined) {
+        const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
+        localStorage.setItem('ce_favs', JSON.stringify(favArr));
+      }
+      // Mark last check so background check skips for an hour
+      localStorage.setItem('ce_last_check', String(Date.now()));
+    } catch(e) {
+      // If network fails, allow entry (offline use) but don't skip background check
+    }
+  }
+
+  btn.textContent = 'Loading…';
   if (!allContent.length) await loadAllContent().catch(() => {});
   renderTiles();
   updateHomeGreeting();
   showScreen('screen-home');
   btn.textContent = 'Enter'; btn.disabled = false;
 
-  // Check blocked + sync favorites once per day in background
+  // Background check still runs for subsequent app opens (boot path)
   checkUserInBackground(user.email);
 }
 
@@ -595,13 +627,14 @@ async function fetchTabContent(tabName) {
     const qi = ci('question');
     const si = ci('subcategory');
     const li = ci('subcategory_logo');
+    const vi = ci('video_url');
     return rows.slice(1).map((cols, idx) => {
       const v = i => (i >= 0 && cols[i] != null) ? csvVal(cols[i]) : '';
       const title = v(ti);
       if (!title) return null;
       const expRaw = v(ei);
       const expImages = expRaw ? expRaw.split(',').map(u => u.trim()).filter(Boolean) : [];
-      return { id:`${tabName}__${idx}`, category:tabName, title, body:v(bi), imageUrl:v(ii), tags:v(gi), expImages, question:v(qi), subcategory:v(si), subcategoryLogo:v(li) };
+      return { id:`${tabName}__${idx}`, category:tabName, title, body:v(bi), imageUrl:v(ii), videoUrl:v(vi), tags:v(gi), expImages, question:v(qi), subcategory:v(si), subcategoryLogo:v(li) };
     }).filter(Boolean);
   } catch(e) { return []; }
 }
@@ -677,54 +710,34 @@ function driveURL(url) {
 }
 
 // ── MEDIA RENDERER ───────────────────────────────────
-function renderMedia(url, title, container) {
-  if (!url) {
+function renderMedia(imageUrl, videoUrl, title, container) {
+  // If video_url column is filled — always show as tap-to-open video
+  if (videoUrl) {
+    renderVideoPlayer(videoUrl, container);
+    return;
+  }
+
+  if (!imageUrl) {
     container.innerHTML = '';
     container.style.display = 'none';
     return;
   }
 
-  // Detect video by file extension in URL
-  const lower = url.toLowerCase();
+  // Detect video by file extension in image_url
+  const lower = imageUrl.toLowerCase();
   const isVideo = /\.(mp4|mov|avi|webm|mkv|m4v|wmv)([?#]|$)/.test(lower);
-
   if (isVideo) {
-    renderVideoPlayer(url, container);
+    renderVideoPlayer(imageUrl, container);
     return;
   }
 
-  // Google Drive link — check if it's explicitly marked as video via sheet column
-  // OR if the URL is a /file/d/ share link (these are almost always videos when image_url is used)
-  const isDriveFile = /drive\.google\.com\/file\/d\//i.test(url);
-  const src = driveURL(url);
-
-  if (isDriveFile) {
-    // Drive file links: try image first; if it loads show as image, else show as video tap
-    container.className = 'content-img-wrap';
-    container.style.display = 'flex';
-    container.style.paddingBottom = '';
-    container.style.height = '';
-    container.style.position = '';
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = title;
-    img.loading = 'lazy';
-    img.style.cssText = 'width:100%;height:auto;display:block;cursor:zoom-in';
-    img.onclick = () => openViewer(img.src);
-    img.onerror = () => { renderVideoPlayer(url, container); };
-    container.innerHTML = '';
-    container.appendChild(img);
-    return;
-  }
-
-  // Non-Drive URL — render as plain image
+  // Render as image
+  const src = driveURL(imageUrl);
   container.className = 'content-img-wrap';
+  container.style.cssText = '';
   container.style.display = 'flex';
-  container.style.paddingBottom = '';
-  container.style.height = '';
-  container.style.position = '';
   const img = document.createElement('img');
-  img.src = url;
+  img.src = src;
   img.alt = title;
   img.loading = 'lazy';
   img.style.cssText = 'width:100%;height:auto;display:block;cursor:zoom-in';
@@ -950,7 +963,7 @@ function openContent(id) {
 
     // Media — image, gif or video
   const imgWrap = document.getElementById('content-img-wrap');
-  renderMedia(item.imageUrl, item.title, imgWrap);
+  renderMedia(item.imageUrl, item.videoUrl, item.title, imgWrap);
 
     // Explanation text
   // Render body text preserving paragraphs and bullet points from Google Sheets
