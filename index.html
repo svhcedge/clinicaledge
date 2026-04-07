@@ -29,16 +29,12 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .screen.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes floatUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-
-/* LOADING */
 #loading-overlay{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 #loading-overlay.hidden{display:none}
 .loading-logo{font-size:28px;font-weight:600;color:var(--white);letter-spacing:-.5px}
 .loading-logo span{color:var(--purple3)}
 .loading-spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--purple2);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* SPLASH */
 #screen-splash{background:radial-gradient(ellipse at 50% 25%,#3d0090 0%,#180035 45%,#0a0f1e 100%);align-items:center;justify-content:center;padding:48px 32px;text-align:center;position:relative;overflow:hidden}
 .orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
 .orb1{width:360px;height:360px;background:rgba(124,58,237,.3);top:-100px;right:-100px}
@@ -58,8 +54,6 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .btn-splash:hover{opacity:.92;transform:translateY(-2px)}
 .btn-splash:active{transform:scale(.97)}
 .btn-splash:disabled{opacity:.5;cursor:not-allowed}
-
-/* REGISTER */
 #screen-register{background:radial-gradient(ellipse at 50% 0%,#3b0080 0%,#160030 45%,#0a0f1e 100%);align-items:center;justify-content:center;padding:32px 24px}
 .reg-top{text-align:center;margin-bottom:24px}
 .reg-logo{font-size:26px;font-weight:600;letter-spacing:-.5px;color:var(--white)}
@@ -77,15 +71,12 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .btn-primary:active{transform:scale(.98)}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .reg-error{display:none;margin-top:12px;padding:10px 14px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius-sm);font-size:13px;color:#fca5a5;text-align:center;line-height:1.5}
-
-/* TOPBAR */
 .topbar{position:sticky;top:0;z-index:50;background:rgba(10,15,30,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;min-height:56px;gap:12px}
 .topbar-logo{font-size:20px;font-weight:600;color:var(--white);flex:1;letter-spacing:-.3px}
 .topbar-logo span{color:var(--purple3)}
 .back-btn{display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--purple3);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;padding:6px 0;flex-shrink:0}
-.back-btn svg{width:18px;height:18px}
+.back-btn svg,.home-btn svg{width:18px;height:18px}
 .home-btn{display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--purple3);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;padding:6px 0;flex-shrink:0}
-.home-btn svg{width:18px;height:18px}
 .topbar-title{font-size:16px;font-weight:500;color:var(--white);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .icon-btn{background:none;border:none;color:var(--purple3);font-size:20px;cursor:pointer;padding:4px 6px;flex-shrink:0;transition:transform .3s}
 .icon-btn:active{transform:rotate(180deg)}
@@ -94,8 +85,6 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .star-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:4px 0 4px 8px;line-height:1;color:var(--muted);flex-shrink:0;transition:color .15s,transform .1s}
 .star-btn.starred{color:#facc15}
 .star-btn:active{transform:scale(1.3)}
-
-/* HOME */
 #screen-home{background:var(--bg)}
 .home-body{flex:1;padding:16px}
 .search-wrap{position:relative;margin-bottom:20px}
@@ -117,7 +106,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .tile:hover::before,.tile:active::before{opacity:1}
 .tile:hover{border-color:var(--purple2);transform:translateY(-2px)}
 .tile:active{transform:scale(.97)}
-@media (hover: none){
+@media (hover:none){
   .tile:hover{border-color:var(--border);transform:none;background:var(--bg3)}
   .tile:hover::before{opacity:0}
   .content-list-item:hover{border-color:var(--border);background:var(--bg3)}
@@ -131,8 +120,6 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .status-msg{text-align:center;padding:32px 16px;color:var(--muted);font-size:14px;line-height:1.8;grid-column:1/-1}
 .status-icon{font-size:32px;margin-bottom:12px}
 .status-title{font-size:16px;font-weight:500;color:var(--white3);margin-bottom:8px}
-
-/* CATEGORY LIST */
 #screen-category{background:var(--bg)}
 .cat-body{flex:1;padding:16px}
 .content-list-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:border-color .1s,background .1s;-webkit-tap-highlight-color:transparent}
@@ -141,8 +128,6 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .content-list-title{font-size:14px;color:var(--white);flex:1;line-height:1.4}
 .content-list-arrow{color:var(--muted);font-size:18px;flex-shrink:0}
 .content-list-cat{font-size:11px;color:var(--muted);flex-shrink:0}
-
-/* CONTENT PAGE */
 #screen-content{background:var(--bg)}
 .content-body{flex:1;padding:16px;padding-bottom:40px}
 .content-title-h{font-size:16px;font-weight:500;color:var(--white3);margin-bottom:12px;line-height:1.4}
@@ -160,35 +145,38 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
 .explanation-images{display:flex;flex-direction:column;gap:12px}
 .explanation-img-wrap{width:100%;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;min-height:120px}
 .explanation-img-wrap img{width:100%;height:auto;display:block;cursor:zoom-in}
-
-/* FULLSCREEN IMAGE VIEWER */
+/* Built-in video player */
+.vid-player-wrap{width:100%;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:#000;margin-bottom:16px;position:relative}
+.vid-player-wrap video{width:100%;display:block;max-height:70vh;outline:none}
+.vid-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);cursor:pointer;transition:opacity .2s}
+.vid-overlay.hidden{opacity:0;pointer-events:none}
+.vid-play-icon{width:64px;height:64px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.vid-controls{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,0,0,0.75);position:absolute;bottom:0;left:0;right:0}
+.vid-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0}
+.vid-progress{flex:1;height:4px;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;position:relative;min-width:0}
+.vid-progress-bar{height:100%;background:var(--purple2);border-radius:2px;width:0%;pointer-events:none}
+.vid-time{font-size:11px;color:rgba(255,255,255,.8);white-space:nowrap;min-width:72px;text-align:right}
 #img-viewer{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.96);display:none;align-items:center;justify-content:center;touch-action:none}
 #img-viewer.open{display:flex}
 #img-viewer-close{position:absolute;top:72px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 #img-viewer-img{max-width:100vw;max-height:100vh;object-fit:contain;display:block;transform-origin:center center;will-change:transform;touch-action:none;user-select:none;-webkit-user-select:none}
-
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
 </style>
 </head>
 <body>
-
 <div id="loading-overlay">
   <div class="loading-logo">Clinical<span>EDGE</span></div>
   <div class="loading-spinner"></div>
 </div>
-
-<!-- FULLSCREEN VIEWER -->
 <div id="img-viewer">
   <button id="img-viewer-close" onclick="closeViewer()">&#x2715;</button>
   <img id="img-viewer-img" src="" alt="">
 </div>
-
-<!-- SCREEN 1: SPLASH -->
+<!-- SPLASH -->
 <div class="screen" id="screen-splash">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
   <div class="splash-content">
     <div class="splash-logo">Clinical<span>EDGE</span></div>
     <div class="splash-org">Academic Division of IM Residency Program<br>St Vincent Hospital</div>
@@ -202,8 +190,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <button class="btn-splash" id="splash-btn" onclick="handleSplashEnter()">Enter</button>
   </div>
 </div>
-
-<!-- SCREEN 2: REGISTER -->
+<!-- REGISTER -->
 <div class="screen" id="screen-register">
   <div class="reg-top">
     <div class="reg-logo">Clinical<span>EDGE</span></div>
@@ -219,14 +206,13 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <div class="reg-error" id="reg-error"></div>
   </div>
 </div>
-
-<!-- SCREEN 3: HOME -->
+<!-- HOME -->
 <div class="screen" id="screen-home">
   <div class="topbar">
     <div class="topbar-logo">Clinical<span>EDGE</span></div>
     <div id="home-greeting" style="font-size:12px;color:var(--muted);flex-shrink:0"></div>
     <button class="icon-btn" id="refresh-btn" onclick="handleRefresh()" title="Refresh">&#8635;</button>
-    <button class="logout-btn" id="logout-btn" onclick="handleLogout(false)" title="Logout" style="display:none">Logout</button>
+    <button class="logout-btn" id="logout-btn" onclick="handleLogout(false)" style="display:none">Logout</button>
   </div>
   <div class="home-body">
     <div class="search-wrap">
@@ -241,8 +227,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     </div>
   </div>
 </div>
-
-<!-- SCREEN 4: CATEGORY LIST -->
+<!-- CATEGORY LIST -->
 <div class="screen" id="screen-category">
   <div class="topbar">
     <button class="back-btn" onclick="navBack()">
@@ -255,8 +240,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
   </div>
   <div class="cat-body"><div id="content-list"></div></div>
 </div>
-
-<!-- SCREEN 5: CONTENT PAGE -->
+<!-- CONTENT PAGE -->
 <div class="screen" id="screen-content">
   <div class="topbar">
     <button class="back-btn" onclick="navBack()">
@@ -273,7 +257,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <div id="question-box" style="display:none" class="question-box">
       <span class="question-text" id="question-text"></span>
     </div>
-    <div class="content-img-wrap" id="content-img-wrap"></div>
+    <div id="content-img-wrap" class="content-img-wrap"></div>
     <button class="btn-explain" id="explain-btn" onclick="toggleExplanation()">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1 1 0 20A10 10 0 0 1 12 2z"/></svg>
       <span id="explain-btn-text">Show explanation</span>
@@ -284,7 +268,6 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     </div>
   </div>
 </div>
-
 <script>
 // ── CONFIG ──────────────────────────────────────────
 const SHEET_ID         = '1gzTGUuVuUoW4MLApbZOkvYmSi7Z8ibbP7pWGAN3DTcg';
@@ -294,13 +277,9 @@ const APPS_URL         = 'https://script.google.com/macros/s/AKfycbyezSKI8DVaPT0
 const ICON_LIST        = ['🫀','🩻','🧠','🦟','🔬','📄','💊','🩺','📊','🧬','💉','📋'];
 
 // ── STATE ───────────────────────────────────────────
-let allContent         = [];
-let sheetTabs          = [];
-let fuse               = null;
-let explanationVisible = false;
-let prevCategoryTab    = null;
-let currentItemId      = null;
-const navStack         = [];
+let allContent = [], sheetTabs = [], fuse = null;
+let explanationVisible = false, prevCategoryTab = null, currentItemId = null;
+const navStack = [];
 
 // ── BOOT ────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -321,73 +300,62 @@ function _showDirectHome() {
   if (document.activeElement) document.activeElement.blur();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-home').classList.add('active');
-  window.scrollTo(0, 0);
-  navStack.length = 0;
-  navStack.push('screen-home');
+  window.scrollTo(0,0);
+  navStack.length = 0; navStack.push('screen-home');
   history.replaceState({s:'screen-home'}, '');
 }
 
-window.addEventListener('popstate', () => { navBack(); });
+window.addEventListener('popstate', () => navBack());
 
 // ── REFRESH ─────────────────────────────────────────
 async function handleRefresh() {
   const btn = document.getElementById('refresh-btn');
-  if (btn) { btn.style.animation = 'spin .6s linear'; setTimeout(() => btn.style.animation = '', 700); }
-  await loadAllContent().catch(() => {});
+  if (btn) { btn.style.animation='spin .6s linear'; setTimeout(()=>btn.style.animation='',700); }
+  await loadAllContent().catch(()=>{});
   renderTiles();
   const user = getUser();
   if (user && APPS_URL) {
     fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`)
-      .then(r => r.json())
-      .then(json => {
+      .then(r=>r.json()).then(json=>{
         if (json.blocked) { handleLogout(true); return; }
         if (json.favorites !== undefined) {
-          const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
-          localStorage.setItem('ce_favs', JSON.stringify(favArr));
+          localStorage.setItem('ce_favs', JSON.stringify(json.favorites ? json.favorites.split(',').filter(Boolean) : []));
           renderTiles();
         }
-      }).catch(() => {});
+      }).catch(()=>{});
   }
 }
 
-// ── BACKGROUND BLOCK CHECK ───────────────────────────
+// ── BACKGROUND BLOCK CHECK (every hour) ─────────────
 function checkUserInBackground(email) {
   if (!APPS_URL) return;
-  const lastCheck = localStorage.getItem('ce_last_check');
-  const now = Date.now();
-  const ONE_HOUR = 60 * 60 * 1000;
-  if (lastCheck && (now - parseInt(lastCheck)) < ONE_HOUR) return;
+  const last = localStorage.getItem('ce_last_check');
+  const now  = Date.now();
+  if (last && (now - parseInt(last)) < 3600000) return;
   fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(email)}`)
-    .then(r => r.json())
-    .then(json => {
+    .then(r=>r.json()).then(json=>{
       localStorage.setItem('ce_last_check', String(now));
       if (json.blocked) {
-        localStorage.removeItem('ce_user');
-        localStorage.removeItem('ce_favs');
-        localStorage.removeItem('ce_last_check');
+        localStorage.removeItem('ce_user'); localStorage.removeItem('ce_favs'); localStorage.removeItem('ce_last_check');
         alert('Your access has been revoked. Please contact the administrator.');
-        handleLogout(true);
-        return;
+        handleLogout(true); return;
       }
       if (json.favorites !== undefined) {
-        const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
-        localStorage.setItem('ce_favs', JSON.stringify(favArr));
+        localStorage.setItem('ce_favs', JSON.stringify(json.favorites ? json.favorites.split(',').filter(Boolean) : []));
         renderTiles();
       }
-    }).catch(() => {});
+    }).catch(()=>{});
 }
 
 // ── LOGOUT ──────────────────────────────────────────
 function handleLogout(forced) {
   if (!forced && !confirm('Log out of ClinicalEDGE?')) return;
-  localStorage.removeItem('ce_user');
-  localStorage.removeItem('ce_favs');
-  localStorage.removeItem('ce_last_check');
+  ['ce_user','ce_favs','ce_last_check'].forEach(k=>localStorage.removeItem(k));
   navStack.length = 0;
   document.getElementById('splash-tagline').style.display = 'block';
   document.getElementById('splash-greeting').classList.remove('show');
   document.getElementById('splash-name').textContent = '';
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-splash').classList.add('active');
   history.replaceState({s:'screen-splash'}, '');
 }
@@ -395,579 +363,512 @@ function handleLogout(forced) {
 function updateHomeGreeting() {
   const user = getUser();
   const greet = document.getElementById('home-greeting');
-  const logoutBtn = document.getElementById('logout-btn');
-  if (user && greet) {
-    greet.textContent = `Hello, ${user.first}`;
-    if (logoutBtn) logoutBtn.style.display = 'block';
-  }
+  const lb = document.getElementById('logout-btn');
+  if (user && greet) { greet.textContent=`Hello, ${user.first}`; if(lb) lb.style.display='block'; }
 }
 
-// ── SCREEN NAVIGATION ───────────────────────────────
+// ── NAVIGATION ───────────────────────────────────────
 function showScreen(id) {
-  if (id === 'screen-register' && getUser()) return;
-  document.querySelectorAll('.tile, .content-list-item, .search-result-item').forEach(el => {
-    el.style.background = ''; el.style.borderColor = ''; el.style.transform = '';
+  if (id==='screen-register' && getUser()) return;
+  document.querySelectorAll('.tile,.content-list-item,.search-result-item').forEach(el=>{
+    el.style.background=''; el.style.borderColor=''; el.style.transform='';
   });
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-  window.scrollTo(0, 0);
-  navStack.push(id);
-  history.pushState({s: id}, '');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id); if(el) el.classList.add('active');
+  window.scrollTo(0,0); navStack.push(id); history.pushState({s:id},'');
 }
-
 function navBack() {
   navStack.pop();
-  if (navStack.length === 0 || navStack[navStack.length-1] === 'screen-home') {
-    navStack.length = 0;
-    navStack.push('screen-home');
-    _activateScreen('screen-home');
-    return;
+  if (!navStack.length || navStack[navStack.length-1]==='screen-home') {
+    navStack.length=0; navStack.push('screen-home'); _activateScreen('screen-home'); return;
   }
-  _activateScreen(navStack[navStack.length - 1]);
+  _activateScreen(navStack[navStack.length-1]);
 }
-
 function _activateScreen(id) {
-  document.querySelectorAll('.tile, .content-list-item, .search-result-item').forEach(el => {
-    el.style.background = ''; el.style.borderColor = ''; el.style.transform = '';
+  document.querySelectorAll('.tile,.content-list-item,.search-result-item').forEach(el=>{
+    el.style.background=''; el.style.borderColor=''; el.style.transform='';
   });
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-  window.scrollTo(0, 0);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id); if(el) el.classList.add('active');
+  window.scrollTo(0,0);
 }
-
 function goHome() {
-  navStack.length = 0;
-  navStack.push('screen-home');
-  _activateScreen('screen-home');
-  history.replaceState({s:'screen-home'}, '');
+  navStack.length=0; navStack.push('screen-home');
+  _activateScreen('screen-home'); history.replaceState({s:'screen-home'},'');
 }
 
-// ── SPLASH ──────────────────────────────────────────
+// ── SPLASH ENTER ────────────────────────────────────
 async function handleSplashEnter() {
   const user = getUser();
   if (!user) { showScreen('screen-register'); return; }
   const btn = document.getElementById('splash-btn');
-  btn.textContent = 'Verifying…'; btn.disabled = true;
-
-  // Always check blocked status synchronously before entering
+  btn.textContent='Verifying…'; btn.disabled=true;
+  // Always verify block status before allowing entry
   if (APPS_URL) {
     try {
       const res  = await fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(user.email)}`);
       const json = await res.json();
       if (json.blocked) {
-        localStorage.removeItem('ce_user');
-        localStorage.removeItem('ce_favs');
-        localStorage.removeItem('ce_last_check');
-        btn.textContent = 'Enter'; btn.disabled = false;
+        ['ce_user','ce_favs','ce_last_check'].forEach(k=>localStorage.removeItem(k));
+        btn.textContent='Enter'; btn.disabled=false;
         alert('Your access has been revoked. Please contact the administrator.');
         return;
       }
-      if (json.favorites !== undefined) {
-        const favArr = json.favorites ? json.favorites.split(',').filter(Boolean) : [];
-        localStorage.setItem('ce_favs', JSON.stringify(favArr));
-      }
+      if (json.favorites !== undefined)
+        localStorage.setItem('ce_favs', JSON.stringify(json.favorites ? json.favorites.split(',').filter(Boolean) : []));
       localStorage.setItem('ce_last_check', String(Date.now()));
-    } catch(e) {
-      // Network fail — allow offline entry
-    }
+    } catch(e) { /* offline — allow entry */ }
   }
-
-  btn.textContent = 'Loading…';
-  if (!allContent.length) await loadAllContent().catch(() => {});
-  renderTiles();
-  updateHomeGreeting();
-  showScreen('screen-home');
-  btn.textContent = 'Enter'; btn.disabled = false;
+  btn.textContent='Loading…';
+  if (!allContent.length) await loadAllContent().catch(()=>{});
+  renderTiles(); updateHomeGreeting(); showScreen('screen-home');
+  btn.textContent='Enter'; btn.disabled=false;
   checkUserInBackground(user.email);
 }
 
 // ── USER STORAGE ────────────────────────────────────
-function getUser()   { try { return JSON.parse(localStorage.getItem('ce_user')); } catch(e) { return null; } }
+function getUser()   { try { return JSON.parse(localStorage.getItem('ce_user')); } catch(e){return null;} }
 function saveUser(u) { localStorage.setItem('ce_user', JSON.stringify(u)); }
 
 // ── REGISTRATION ────────────────────────────────────
+// Logic:
+//   1. Validate fields + institution code
+//   2. Call checkUser to see if email exists in sheet
+//   3a. Email NOT found → new user → register + save + enter
+//   3b. Email found + name MATCHES → returning user on new device → save locally + enter
+//   3c. Email found + name MISMATCH → show error, ask to check name/email
 async function handleRegister() {
   const first = document.getElementById('reg-firstname').value.trim();
   const last  = document.getElementById('reg-lastname').value.trim();
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const code  = document.getElementById('reg-code').value.trim().toUpperCase();
   const btn   = document.getElementById('reg-btn');
-  document.getElementById('reg-error').style.display = 'none';
-
+  document.getElementById('reg-error').style.display='none';
   if (!first||!last||!email||!code) { showRegError('Please fill in all fields.'); return; }
   if (!email.includes('@')||!email.includes('.')) { showRegError('Please enter a valid email address.'); return; }
-  if (code !== INSTITUTION_CODE) { showRegError('Invalid institution code. Please contact your administrator.'); return; }
-
-  btn.textContent = 'Checking…'; btn.disabled = true;
-
-  // ── CHECK IF EMAIL ALREADY REGISTERED ───────────────
-  // Query the backend before saving anything
+  if (code!==INSTITUTION_CODE) { showRegError('Invalid institution code. Please contact your administrator.'); return; }
+  btn.textContent='Checking…'; btn.disabled=true;
   if (APPS_URL) {
     try {
       const res  = await fetch(`${APPS_URL}?action=checkUser&email=${encodeURIComponent(email)}`);
       const json = await res.json();
       if (json.found) {
-        // Email already in _users sheet — block duplicate registration
-        btn.textContent = 'Register & Enter'; btn.disabled = false;
-        showRegError('An account with this email already exists. If this is you, please go back and tap Enter on the previous screen.');
+        // Email exists — check if name matches
+        const firstMatch = json.first ? json.first.trim().toLowerCase()===first.toLowerCase() : true;
+        const lastMatch  = json.last  ? json.last.trim().toLowerCase()===last.toLowerCase()   : true;
+        if (!firstMatch || !lastMatch) {
+          btn.textContent='Register & Enter'; btn.disabled=false;
+          showRegError('This email is already registered with a different name. Please check your first and last name and try again.');
+          return;
+        }
+        // Name matches — treat as returning user on new device
+        saveUser({ first:json.first||first, last:json.last||last, email, registeredAt: new Date().toISOString() });
+        if (json.favorites !== undefined)
+          localStorage.setItem('ce_favs', JSON.stringify(json.favorites ? json.favorites.split(',').filter(Boolean) : []));
+        localStorage.setItem('ce_last_check', String(Date.now()));
+        btn.textContent='Loading content…';
+        await loadAllContent().catch(()=>{});
+        renderTiles(); updateHomeGreeting(); showScreen('screen-home');
+        btn.textContent='Register & Enter'; btn.disabled=false;
         return;
       }
-    } catch(e) {
-      // Network fail — allow registration to proceed
-    }
+    } catch(e) { /* network fail — proceed with registration */ }
   }
-
-  btn.textContent = 'Registering…';
-
-  // Register with backend (no-cors fire-and-forget)
+  // New user
+  btn.textContent='Registering…';
   try {
-    fetch(APPS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type':'text/plain'},
-      body: JSON.stringify({ action:'register', first, last, email })
-    }).catch(() => {});
+    fetch(APPS_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({action:'register', first, last, email}) }).catch(()=>{});
   } catch(e) {}
-
   saveUser({ first, last, email, registeredAt: new Date().toISOString() });
   await loadFavsFromServer(email);
-
-  btn.textContent = 'Loading content…';
-  await loadAllContent().catch(() => {});
-  renderTiles();
-  updateHomeGreeting();
-  showScreen('screen-home');
-  btn.textContent = 'Register & Enter'; btn.disabled = false;
+  btn.textContent='Loading content…';
+  await loadAllContent().catch(()=>{});
+  renderTiles(); updateHomeGreeting(); showScreen('screen-home');
+  btn.textContent='Register & Enter'; btn.disabled=false;
 }
 
 function showRegError(msg) {
-  const el = document.getElementById('reg-error');
-  el.textContent = msg; el.style.display = 'block';
+  const el=document.getElementById('reg-error'); el.textContent=msg; el.style.display='block';
 }
 
 // ── LOGO CACHE ──────────────────────────────────────
 let tabLogos = {};
-function saveLogoCache(logos) { try { localStorage.setItem('ce_logos', JSON.stringify(logos)); } catch(e) {} }
-function loadLogoCache()      { try { return JSON.parse(localStorage.getItem('ce_logos') || '{}'); } catch(e) { return {}; } }
+function saveLogoCache(l) { try{localStorage.setItem('ce_logos',JSON.stringify(l));}catch(e){} }
+function loadLogoCache()  { try{return JSON.parse(localStorage.getItem('ce_logos')||'{}');}catch(e){return{};} }
 
-// ── FETCH TAB NAMES ──────────────────────────────────
+// ── FETCH TABS ───────────────────────────────────────
 async function loadTabNames() {
-  tabLogos = loadLogoCache(); // instant cache first
+  tabLogos = loadLogoCache();
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TABS_SHEET)}`;
   try {
-    const res  = await fetch(url);
-    if (!res.ok) return Object.keys(tabLogos).length ? Object.keys(tabLogos) : [];
-    const text = await res.text();
-    const rows = parseCSVFull(text);
-    tabLogos = {};
-    const tabs = [];
-    for (let i = 1; i < rows.length; i++) {
-      const name = csvVal(rows[i][0] || '');
-      const logo = rows[i][1] ? csvVal(rows[i][1]) : '';
-      if (!name || name.toLowerCase() === 'tabs' || name.toLowerCase() === 'categories' || name.startsWith('_')) continue;
-      tabs.push(name);
-      if (logo) tabLogos[name] = driveURL(logo);
+    const res=await fetch(url); if(!res.ok) return Object.keys(tabLogos).length?Object.keys(tabLogos):[];
+    const rows=parseCSVFull(await res.text()); tabLogos={};
+    const tabs=[];
+    for(let i=1;i<rows.length;i++){
+      const name=csvVal(rows[i][0]||''), logo=rows[i][1]?csvVal(rows[i][1]):'';
+      if(!name||name.toLowerCase()==='tabs'||name.toLowerCase()==='categories'||name.startsWith('_')) continue;
+      tabs.push(name); if(logo) tabLogos[name]=driveURL(logo);
     }
-    saveLogoCache(tabLogos);
-    return tabs;
-  } catch(e) { return []; }
+    saveLogoCache(tabLogos); return tabs;
+  } catch(e){return [];}
 }
 
 // ── FETCH CONTENT ────────────────────────────────────
-// Columns (order-independent): title | body_text | image_url | video_url |
-//   tags | explanation_images | explanation_videos | question | subcategory | subcategory_logo
+// Columns: title | body_text | image_url | video_url | tags |
+//          explanation_images | explanation_videos | question | subcategory | subcategory_logo
 async function fetchTabContent(tabName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
   try {
-    const res  = await fetch(url);
-    if (!res.ok) return [];
-    const text = await res.text();
-    const rows = parseCSVFull(text);
-    if (rows.length < 2) return [];
-    const headers = rows[0].map(h => csvVal(h).toLowerCase().trim());
-    const ci = n => headers.indexOf(n);
-    const ti  = ci('title') >= 0 ? ci('title') : 0;
-    const bi  = ci('body_text');
-    const ii  = ci('image_url');
-    const vi  = ci('video_url');
-    const gi  = ci('tags');
-    const ei  = ci('explanation_images');
-    const evi = ci('explanation_videos');
-    const qi  = ci('question');
-    const si  = ci('subcategory');
-    const li  = ci('subcategory_logo');
-    return rows.slice(1).map((cols, idx) => {
-      const v = i => (i >= 0 && cols[i] != null) ? csvVal(cols[i]) : '';
-      const title = v(ti);
-      if (!title) return null;
-      const expImages = v(ei)  ? v(ei).split(',').map(u => u.trim()).filter(Boolean) : [];
-      const expVideos = v(evi) ? v(evi).split(',').map(u => u.trim()).filter(Boolean) : [];
-      return { id:`${tabName}__${idx}`, category:tabName, title,
-               body:v(bi), imageUrl:v(ii), videoUrl:v(vi), tags:v(gi),
-               expImages, expVideos, question:v(qi),
-               subcategory:v(si), subcategoryLogo:v(li) };
+    const res=await fetch(url); if(!res.ok) return [];
+    const rows=parseCSVFull(await res.text()); if(rows.length<2) return [];
+    const hdr=rows[0].map(h=>csvVal(h).toLowerCase().trim());
+    const ci=n=>hdr.indexOf(n);
+    const ti=ci('title')>=0?ci('title'):0, bi=ci('body_text'), ii=ci('image_url'), vi=ci('video_url');
+    const gi=ci('tags'), ei=ci('explanation_images'), evi=ci('explanation_videos');
+    const qi=ci('question'), si=ci('subcategory'), li=ci('subcategory_logo');
+    return rows.slice(1).map((cols,idx)=>{
+      const v=i=>(i>=0&&cols[i]!=null)?csvVal(cols[i]):'';
+      const title=v(ti); if(!title) return null;
+      const expImages=v(ei)?v(ei).split(',').map(u=>u.trim()).filter(Boolean):[];
+      const expVideos=v(evi)?v(evi).split(',').map(u=>u.trim()).filter(Boolean):[];
+      return {id:`${tabName}__${idx}`,category:tabName,title,
+              body:v(bi),imageUrl:v(ii),videoUrl:v(vi),tags:v(gi),
+              expImages,expVideos,question:v(qi),subcategory:v(si),subcategoryLogo:v(li)};
     }).filter(Boolean);
-  } catch(e) { return []; }
+  } catch(e){return [];}
 }
 
 // ── CSV PARSER ───────────────────────────────────────
 function parseCSVFull(text) {
-  const rows = [];
-  let cur = '', inQ = false, row = [];
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (c === '"') {
-      if (inQ && text[i+1] === '"') { cur += '"'; i++; }
-      else inQ = !inQ;
-    } else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
-    else if (c === '\n' && !inQ)  { row.push(cur); cur = ''; rows.push(row); row = []; }
-    else if (c === '\r') {}
-    else cur += c;
+  const rows=[]; let cur='',inQ=false,row=[];
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(c==='"'){if(inQ&&text[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(c===','&&!inQ){row.push(cur);cur='';}
+    else if(c==='\n'&&!inQ){row.push(cur);cur='';rows.push(row);row=[];}
+    else if(c==='\r'){}
+    else cur+=c;
   }
-  if (cur || row.length) { row.push(cur); rows.push(row); }
+  if(cur||row.length){row.push(cur);rows.push(row);}
   return rows;
 }
-function csvVal(s) { return (s||'').replace(/^"|"$/g,'').trim(); }
+function csvVal(s){return(s||'').replace(/^"|"$/g,'').trim();}
 
 async function loadAllContent() {
-  sheetTabs = await loadTabNames();
-  if (!sheetTabs.length) { console.warn('No tabs found'); return; }
-  const results = await Promise.all(sheetTabs.map(fetchTabContent));
-  allContent = results.flat();
-  fuse = new Fuse(allContent, { keys:['title','tags','category'], threshold:0.38, includeScore:true });
+  sheetTabs=await loadTabNames(); if(!sheetTabs.length) return;
+  allContent=(await Promise.all(sheetTabs.map(fetchTabContent))).flat();
+  fuse=new Fuse(allContent,{keys:['title','tags','category'],threshold:0.38,includeScore:true});
 }
 
 // ── DRIVE URL ────────────────────────────────────────
 function driveURL(url) {
-  if (!url) return '';
-  url = url.trim();
-  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  const id = m1 ? m1[1] : (m2 ? m2[1] : null);
-  return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w1600` : url;
+  if(!url) return '';
+  url=url.trim();
+  const m=url.match(/\/d\/([a-zA-Z0-9_-]+)/)||url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600`:url;
+}
+function driveFileId(url) {
+  if(!url) return null;
+  const m=url.match(/\/d\/([a-zA-Z0-9_-]+)/)||url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m?m[1]:null;
 }
 
 // ── MEDIA RENDERER ───────────────────────────────────
 function renderMedia(imageUrl, videoUrl, title, container) {
   if (videoUrl) { renderVideoPlayer(videoUrl, container); return; }
-  if (!imageUrl) { container.innerHTML = ''; container.style.display = 'none'; return; }
-  const lower = imageUrl.toLowerCase();
-  if (/\.(mp4|mov|avi|webm|mkv|m4v|wmv)([?#]|$)/.test(lower)) { renderVideoPlayer(imageUrl, container); return; }
-  const src = driveURL(imageUrl);
-  container.className = 'content-img-wrap';
-  container.style.cssText = '';
-  container.style.display = 'flex';
-  const img = document.createElement('img');
-  img.src = src; img.alt = title; img.loading = 'lazy';
-  img.style.cssText = 'width:100%;height:auto;display:block;cursor:zoom-in';
-  img.onclick = () => openViewer(img.src);
-  container.innerHTML = '';
-  container.appendChild(img);
+  if (!imageUrl) { container.innerHTML=''; container.style.display='none'; return; }
+  if (/\.(mp4|mov|avi|webm|mkv|m4v|wmv)([?#]|$)/i.test(imageUrl)) { renderVideoPlayer(imageUrl, container); return; }
+  const src=driveURL(imageUrl);
+  container.className='content-img-wrap'; container.style.cssText=''; container.style.display='flex';
+  const img=document.createElement('img');
+  img.src=src; img.alt=title; img.loading='lazy';
+  img.style.cssText='width:100%;height:auto;display:block;cursor:zoom-in';
+  img.onclick=()=>openViewer(img.src);
+  container.innerHTML=''; container.appendChild(img);
 }
 
+// ── BUILT-IN VIDEO PLAYER ────────────────────────────
+// Uses Google Drive's uc?export=download direct link for inline playback.
+// Works for mp4 — for mov/other formats it may fall back gracefully.
 function renderVideoPlayer(url, container) {
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  const fileId  = m ? m[1] : null;
-  const poster  = fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w800` : '';
-  const viewUrl = fileId ? `https://drive.google.com/file/d/${fileId}/view` : url;
-  container.className = 'content-img-wrap';
-  container.style.cssText = 'display:flex;align-items:center;justify-content:center;position:relative;min-height:180px;margin-bottom:16px;cursor:pointer;background:#000;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)';
-  container.innerHTML = `
-    <img src="${poster}" style="width:100%;height:auto;display:block;opacity:0.75" onerror="this.style.display='none'">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-    </div>
-    <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;font-size:12px;padding:4px 12px;border-radius:12px;white-space:nowrap">Tap to open video</div>`;
-  container.onclick = () => window.open(viewUrl, '_blank');
+  const fileId = driveFileId(url);
+  // Direct streamable URL for Drive files
+  const videoSrc = fileId ? `https://drive.google.com/uc?export=download&id=${fileId}` : url;
+  const poster   = fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w800` : '';
+
+  container.className = '';
+  container.style.cssText = 'margin-bottom:16px';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'vid-player-wrap';
+
+  const vid = document.createElement('video');
+  vid.preload = 'metadata';
+  if (poster) vid.poster = poster;
+  vid.playsInline = true;
+  vid.controls = false;
+  vid.src = videoSrc;
+  vid.style.cssText = 'width:100%;display:block;max-height:70vh;outline:none';
+
+  // Overlay (play button shown when paused)
+  const overlay = document.createElement('div');
+  overlay.className = 'vid-overlay';
+  overlay.innerHTML = `<div class="vid-play-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>`;
+
+  // Controls bar
+  const controls = document.createElement('div');
+  controls.className = 'vid-controls';
+  controls.innerHTML = `
+    <button class="vid-btn" id="vpb_play">&#9654;</button>
+    <div class="vid-progress" id="vpb_prog"><div class="vid-progress-bar" id="vpb_bar"></div></div>
+    <span class="vid-time" id="vpb_time">0:00 / 0:00</span>`;
+
+  wrap.appendChild(vid);
+  wrap.appendChild(overlay);
+  wrap.appendChild(controls);
+  container.innerHTML = '';
+  container.appendChild(wrap);
+
+  // Wire up controls
+  const playBtn  = controls.querySelector('#vpb_play');
+  const prog     = controls.querySelector('#vpb_prog');
+  const bar      = controls.querySelector('#vpb_bar');
+  const timeEl   = controls.querySelector('#vpb_time');
+
+  function fmt(s) {
+    const m=Math.floor(s/60), sec=Math.floor(s%60);
+    return `${m}:${sec.toString().padStart(2,'0')}`;
+  }
+  function updateTime() {
+    const pct = vid.duration ? (vid.currentTime/vid.duration)*100 : 0;
+    bar.style.width = pct+'%';
+    timeEl.textContent = `${fmt(vid.currentTime)} / ${fmt(vid.duration||0)}`;
+  }
+  function togglePlay() {
+    if (vid.paused) vid.play(); else vid.pause();
+  }
+  vid.addEventListener('play',  ()=>{ playBtn.innerHTML='&#9646;&#9646;'; overlay.classList.add('hidden'); });
+  vid.addEventListener('pause', ()=>{ playBtn.innerHTML='&#9654;'; overlay.classList.remove('hidden'); });
+  vid.addEventListener('ended', ()=>{ playBtn.innerHTML='&#9654;'; overlay.classList.remove('hidden'); vid.currentTime=0; });
+  vid.addEventListener('timeupdate', updateTime);
+  vid.addEventListener('loadedmetadata', updateTime);
+  overlay.addEventListener('click', togglePlay);
+  playBtn.addEventListener('click', togglePlay);
+  prog.addEventListener('click', e=>{
+    if (!vid.duration) return;
+    const rect=prog.getBoundingClientRect();
+    vid.currentTime = ((e.clientX-rect.left)/rect.width)*vid.duration;
+  });
 }
 
 // ── FAVORITES ────────────────────────────────────────
 async function loadFavsFromServer(email) {
   try {
-    const res  = await fetch(`${APPS_URL}?action=getFavs&email=${encodeURIComponent(email)}`);
-    const json = await res.json();
-    if (json.ok && json.favorites) {
-      localStorage.setItem('ce_favs', JSON.stringify(json.favorites.split(',').filter(Boolean)));
-    }
-  } catch(e) {}
+    const res=await fetch(`${APPS_URL}?action=getFavs&email=${encodeURIComponent(email)}`);
+    const json=await res.json();
+    if(json.ok&&json.favorites) localStorage.setItem('ce_favs',JSON.stringify(json.favorites.split(',').filter(Boolean)));
+  } catch(e){}
 }
-function getFavs() { try { return JSON.parse(localStorage.getItem('ce_favs')||'[]'); } catch(e){return[];} }
-function saveFavs(f) {
-  localStorage.setItem('ce_favs', JSON.stringify(f));
-  const user = getUser();
-  if (!user) return;
-  fetch(APPS_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
-    body: JSON.stringify({ action:'saveFavs', email:user.email, favorites:f }) }).catch(() => {});
+function getFavs(){try{return JSON.parse(localStorage.getItem('ce_favs')||'[]');}catch(e){return[];}}
+function saveFavs(f){
+  localStorage.setItem('ce_favs',JSON.stringify(f));
+  const user=getUser(); if(!user) return;
+  fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'saveFavs',email:user.email,favorites:f})}).catch(()=>{});
 }
-function isFav(id) { return getFavs().includes(id); }
-function toggleFavorite() {
-  if (!currentItemId) return;
-  let favs = getFavs();
-  favs = favs.includes(currentItemId) ? favs.filter(f => f !== currentItemId) : [...favs, currentItemId];
+function isFav(id){return getFavs().includes(id);}
+function toggleFavorite(){
+  if(!currentItemId) return;
+  let favs=getFavs();
+  favs=favs.includes(currentItemId)?favs.filter(f=>f!==currentItemId):[...favs,currentItemId];
   saveFavs(favs);
-  const btn = document.getElementById('star-btn');
-  if (btn) btn.classList.toggle('starred', favs.includes(currentItemId));
+  const btn=document.getElementById('star-btn'); if(btn) btn.classList.toggle('starred',favs.includes(currentItemId));
 }
 
 // ── TILES ────────────────────────────────────────────
-function renderTiles() {
-  const grid = document.getElementById('tiles-grid');
-  grid.innerHTML = '';
-  if (!sheetTabs.length) {
-    const msg = document.createElement('div');
-    msg.className = 'status-msg';
-    msg.innerHTML = '<div class="status-icon">🔄</div><div class="status-title">Content temporarily unavailable</div>Please tap &#8635; to try again.';
+function renderTiles(){
+  const grid=document.getElementById('tiles-grid'); grid.innerHTML='';
+  if(!sheetTabs.length){
+    const msg=document.createElement('div'); msg.className='status-msg';
+    msg.innerHTML='<div class="status-icon">🔄</div><div class="status-title">Content temporarily unavailable</div>Please tap &#8635; to try again.';
     grid.appendChild(msg);
   } else {
-    sheetTabs.forEach((tab, idx) => {
-      const count  = allContent.filter(c => c.category === tab).length;
-      const tile   = document.createElement('div');
-      tile.className = 'tile';
-      const logoUrl = tabLogos[tab];
-      const iconHtml = logoUrl
-        ? `<div class="tile-icon"><img src="${logoUrl}" alt="${tab}" onerror="this.parentElement.textContent='${ICON_LIST[idx % ICON_LIST.length]}'"></div>`
-        : `<div class="tile-icon">${ICON_LIST[idx % ICON_LIST.length]}</div>`;
-      tile.innerHTML = `${iconHtml}<div class="tile-name">${tab}</div><div class="tile-count">${count} item${count!==1?'s':''}</div>`;
-      tile.onclick = () => openCategory(tab);
-      grid.appendChild(tile);
+    sheetTabs.forEach((tab,idx)=>{
+      const count=allContent.filter(c=>c.category===tab).length;
+      const tile=document.createElement('div'); tile.className='tile';
+      const logo=tabLogos[tab];
+      const icon=logo?`<div class="tile-icon"><img src="${logo}" alt="${tab}" onerror="this.parentElement.textContent='${ICON_LIST[idx%ICON_LIST.length]}'"></div>`
+                     :`<div class="tile-icon">${ICON_LIST[idx%ICON_LIST.length]}</div>`;
+      tile.innerHTML=`${icon}<div class="tile-name">${tab}</div><div class="tile-count">${count} item${count!==1?'s':''}</div>`;
+      tile.onclick=()=>openCategory(tab); grid.appendChild(tile);
     });
   }
-  const favCount = getFavs().length;
-  const favTile = document.createElement('div');
-  favTile.className = 'tile';
-  favTile.innerHTML = `<div class="tile-icon">⭐</div><div class="tile-name">Favorites</div><div class="tile-count">${favCount} saved</div>`;
-  favTile.onclick = () => openFavorites();
-  grid.appendChild(favTile);
+  const fc=getFavs().length, ft=document.createElement('div'); ft.className='tile';
+  ft.innerHTML=`<div class="tile-icon">⭐</div><div class="tile-name">Favorites</div><div class="tile-count">${fc} saved</div>`;
+  ft.onclick=()=>openFavorites(); grid.appendChild(ft);
 }
 
 // ── SEARCH ───────────────────────────────────────────
-function handleSearch(query) {
-  const resultsEl = document.getElementById('search-results');
-  const tilesEl   = document.getElementById('tiles-section');
-  const q = query.trim();
-  if (!q) { resultsEl.innerHTML=''; resultsEl.classList.remove('visible'); tilesEl.style.display='block'; return; }
-  tilesEl.style.display='none'; resultsEl.classList.add('visible');
-  const results = fuse ? fuse.search(q).slice(0,20) : [];
-  if (!results.length) { resultsEl.innerHTML=`<div class="search-empty">No results for "${q}"</div>`; return; }
-  resultsEl.innerHTML = results.map(r=>`
-    <div class="search-result-item" onclick="openContent('${r.item.id}')">
-      <span class="search-result-cat">${r.item.category}</span>
-      <span class="search-result-title">${r.item.title}</span>
-    </div>`).join('');
+function handleSearch(query){
+  const res=document.getElementById('search-results'), ts=document.getElementById('tiles-section'), q=query.trim();
+  if(!q){res.innerHTML='';res.classList.remove('visible');ts.style.display='block';return;}
+  ts.style.display='none'; res.classList.add('visible');
+  const results=fuse?fuse.search(q).slice(0,20):[];
+  if(!results.length){res.innerHTML=`<div class="search-empty">No results for "${q}"</div>`;return;}
+  res.innerHTML=results.map(r=>`<div class="search-result-item" onclick="openContent('${r.item.id}')">
+    <span class="search-result-cat">${r.item.category}</span>
+    <span class="search-result-title">${r.item.title}</span></div>`).join('');
 }
 
 // ── CATEGORY ─────────────────────────────────────────
-function openCategory(tabName) {
-  const items = allContent.filter(c => c.category === tabName);
-  if (items.some(c => c.subcategory)) openSubcategoryTiles(tabName, items);
-  else openCategoryList(tabName, items);
+function openCategory(tabName){
+  const items=allContent.filter(c=>c.category===tabName);
+  if(items.some(c=>c.subcategory)) openSubcategoryTiles(tabName,items); else openCategoryList(tabName,items);
 }
-
-function openSubcategoryTiles(tabName, items) {
-  document.getElementById('cat-screen-title').textContent = tabName;
-  const list = document.getElementById('content-list');
-  const groups = {}, groupLogos = {};
-  items.forEach(item => {
-    const sub = item.subcategory || '(Other)';
-    if (!groups[sub]) groups[sub] = [];
+function openSubcategoryTiles(tabName,items){
+  document.getElementById('cat-screen-title').textContent=tabName;
+  const list=document.getElementById('content-list'), groups={}, logos={};
+  items.forEach(item=>{
+    const sub=item.subcategory||'(Other)';
+    if(!groups[sub]) groups[sub]=[];
     groups[sub].push(item);
-    if (item.subcategoryLogo && !groupLogos[sub]) groupLogos[sub] = driveURL(item.subcategoryLogo);
+    if(item.subcategoryLogo&&!logos[sub]) logos[sub]=driveURL(item.subcategoryLogo);
   });
-  const subNames = Object.keys(groups);
-  const FALLBACKS = ['🫀','🩻','🧠','🦟','🔬','📄','💊','🩺','📊','🧬','💉','📋'];
-  list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:4px 0">${
-    subNames.map((sub, idx) => {
-      const logo = groupLogos[sub];
-      const icon = logo
-        ? `<div class="tile-icon"><img src="${logo}" alt="${sub}" onerror="this.parentElement.textContent='${FALLBACKS[idx%FALLBACKS.length]}'"></div>`
-        : `<div class="tile-icon">${FALLBACKS[idx%FALLBACKS.length]}</div>`;
+  const subs=Object.keys(groups), FB=['🫀','🩻','🧠','🦟','🔬','📄','💊','🩺','📊','🧬','💉','📋'];
+  list.innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:4px 0">${
+    subs.map((sub,idx)=>{
+      const logo=logos[sub];
+      const icon=logo?`<div class="tile-icon"><img src="${logo}" alt="${sub}" onerror="this.parentElement.textContent='${FB[idx%FB.length]}'"></div>`
+                     :`<div class="tile-icon">${FB[idx%FB.length]}</div>`;
       return `<div class="tile" onclick="openSubcategoryList('${tabName}','${sub.replace(/'/g,"\\'")}')">
         ${icon}<div class="tile-name">${sub}</div>
-        <div class="tile-count">${groups[sub].length} item${groups[sub].length!==1?'s':''}</div>
-      </div>`;
+        <div class="tile-count">${groups[sub].length} item${groups[sub].length!==1?'s':''}</div></div>`;
     }).join('')
   }</div>`;
-  prevCategoryTab = tabName;
+  prevCategoryTab=tabName; showScreen('screen-category');
+}
+function openSubcategoryList(tabName,subName){
+  const items=allContent.filter(c=>c.category===tabName&&c.subcategory===subName);
+  document.getElementById('cat-screen-title').textContent=subName;
+  openCategoryList(subName,items,tabName);
+}
+function openCategoryList(displayName,items){
+  document.getElementById('cat-screen-title').textContent=displayName;
+  const list=document.getElementById('content-list');
+  list.innerHTML=items.length?items.map((item,i)=>`
+    <div class="content-list-item" onclick="openContent('${item.id}')">
+      <span class="content-list-num">${i+1}</span>
+      <span class="content-list-title">${item.title}</span>
+      <span class="content-list-arrow">›</span></div>`).join('')
+    :'<div class="status-msg"><div class="status-icon">📭</div><div class="status-title">No content here yet</div>Please come back later.</div>';
   showScreen('screen-category');
 }
-
-function openSubcategoryList(tabName, subName) {
-  const items = allContent.filter(c => c.category === tabName && c.subcategory === subName);
-  document.getElementById('cat-screen-title').textContent = subName;
-  openCategoryList(subName, items, tabName);
-}
-
-function openCategoryList(displayName, items, parentTab) {
-  document.getElementById('cat-screen-title').textContent = displayName;
-  const list = document.getElementById('content-list');
-  list.innerHTML = items.length
-    ? items.map((item,i)=>`
-        <div class="content-list-item" onclick="openContent('${item.id}')">
-          <span class="content-list-num">${i+1}</span>
-          <span class="content-list-title">${item.title}</span>
-          <span class="content-list-arrow">›</span>
-        </div>`).join('')
-    : '<div class="status-msg"><div class="status-icon">📭</div><div class="status-title">No content here yet</div>Please come back later.</div>';
-  showScreen('screen-category');
-}
-
-function openFavorites() {
-  document.getElementById('cat-screen-title').textContent = '⭐ Favorites';
-  const favs  = getFavs();
-  const items = allContent.filter(c => favs.includes(c.id));
-  const list  = document.getElementById('content-list');
-  list.innerHTML = items.length
-    ? items.map((item,i)=>`
-        <div class="content-list-item" onclick="openContent('${item.id}')">
-          <span class="content-list-num">${i+1}</span>
-          <span class="content-list-title">${item.title}</span>
-          <span class="content-list-cat">${item.category}</span>
-        </div>`).join('')
-    : '<div class="status-msg"><div class="status-icon">⭐</div><div class="status-title">No favorites yet</div>Tap the star on any content page to save it here.</div>';
+function openFavorites(){
+  document.getElementById('cat-screen-title').textContent='⭐ Favorites';
+  const favs=getFavs(), items=allContent.filter(c=>favs.includes(c.id));
+  const list=document.getElementById('content-list');
+  list.innerHTML=items.length?items.map((item,i)=>`
+    <div class="content-list-item" onclick="openContent('${item.id}')">
+      <span class="content-list-num">${i+1}</span>
+      <span class="content-list-title">${item.title}</span>
+      <span class="content-list-cat">${item.category}</span></div>`).join('')
+    :'<div class="status-msg"><div class="status-icon">⭐</div><div class="status-title">No favorites yet</div>Tap the star on any content page to save it here.</div>';
   showScreen('screen-category');
 }
 
 // ── CONTENT PAGE ─────────────────────────────────────
-function openContent(id) {
-  const item = allContent.find(c => c.id === id);
-  if (!item) return;
-  currentItemId = id;
-
-  document.getElementById('content-screen-title').textContent = item.category;
-  document.getElementById('content-title').textContent = item.title;
-  document.getElementById('star-btn').classList.toggle('starred', isFav(id));
-
-  // Question box
-  const qBox = document.getElementById('question-box');
-  const qText = document.getElementById('question-text');
-  if (item.question) {
-    qText.innerHTML = item.question
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    qBox.style.display = 'block';
-  } else { qBox.style.display = 'none'; }
-
-  // Main media
+function openContent(id){
+  const item=allContent.find(c=>c.id===id); if(!item) return;
+  currentItemId=id;
+  document.getElementById('content-screen-title').textContent=item.category;
+  document.getElementById('content-title').textContent=item.title;
+  document.getElementById('star-btn').classList.toggle('starred',isFav(id));
+  const qBox=document.getElementById('question-box'), qText=document.getElementById('question-text');
+  if(item.question){
+    qText.innerHTML=item.question.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    qBox.style.display='block';
+  } else qBox.style.display='none';
   renderMedia(item.imageUrl, item.videoUrl, item.title, document.getElementById('content-img-wrap'));
-
-  // Explanation text
-  const bodyEl = document.getElementById('explanation-text');
-  if (item.body) {
-    bodyEl.innerHTML = item.body
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    bodyEl.style.display = '';
-  } else { bodyEl.innerHTML = ''; bodyEl.style.display = 'none'; }
-
-  // Explanation images + videos
-  const imgsEl = document.getElementById('explanation-images');
-  imgsEl.innerHTML = '';
-  (item.expImages||[]).forEach((url, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'explanation-img-wrap';
-    wrap.innerHTML = `<img src="${driveURL(url)}" alt="Explanation ${i+1}" loading="lazy"
+  const bodyEl=document.getElementById('explanation-text');
+  if(item.body){
+    bodyEl.innerHTML=item.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    bodyEl.style.display='';
+  } else { bodyEl.innerHTML=''; bodyEl.style.display='none'; }
+  const imgsEl=document.getElementById('explanation-images'); imgsEl.innerHTML='';
+  (item.expImages||[]).forEach((url,i)=>{
+    const wrap=document.createElement('div'); wrap.className='explanation-img-wrap';
+    wrap.innerHTML=`<img src="${driveURL(url)}" alt="Explanation ${i+1}" loading="lazy"
       onclick="openViewer(this.src)"
       onerror="this.parentElement.innerHTML='<div class=\\'img-placeholder\\'>Image could not be loaded.</div>'">`;
     imgsEl.appendChild(wrap);
   });
-  (item.expVideos||[]).forEach(url => {
-    const wrap = document.createElement('div');
-    wrap.style.marginBottom = '12px';
-    imgsEl.appendChild(wrap);
-    renderVideoPlayer(url, wrap);
+  (item.expVideos||[]).forEach(url=>{
+    const wrap=document.createElement('div'); imgsEl.appendChild(wrap); renderVideoPlayer(url,wrap);
   });
-
-  // Show/hide explain button
-  const hasExplanation = item.body || (item.expImages&&item.expImages.length) || (item.expVideos&&item.expVideos.length);
-  document.getElementById('explain-btn').style.display = hasExplanation ? 'flex' : 'none';
-
-  // Reset toggle
+  const has=item.body||(item.expImages&&item.expImages.length)||(item.expVideos&&item.expVideos.length);
+  document.getElementById('explain-btn').style.display=has?'flex':'none';
   document.getElementById('explanation-box').classList.remove('visible');
-  document.getElementById('explain-btn-text').textContent = 'Show explanation';
-  explanationVisible = false;
-
+  document.getElementById('explain-btn-text').textContent='Show explanation';
+  explanationVisible=false;
   showScreen('screen-content');
 }
-
-function toggleExplanation() {
-  explanationVisible = !explanationVisible;
-  document.getElementById('explanation-box').classList.toggle('visible', explanationVisible);
-  document.getElementById('explain-btn-text').textContent = explanationVisible ? 'Hide explanation' : 'Show explanation';
+function toggleExplanation(){
+  explanationVisible=!explanationVisible;
+  document.getElementById('explanation-box').classList.toggle('visible',explanationVisible);
+  document.getElementById('explain-btn-text').textContent=explanationVisible?'Hide explanation':'Show explanation';
 }
 
-// ── FULLSCREEN IMAGE VIEWER ──────────────────────────
-let _vs=1, _vd0=0, _vs0=1, _vx=0, _vy=0, _vlx=0, _vly=0, _vdrag=false;
-
-function openViewer(src) {
-  _vs=1; _vx=0; _vy=0;
-  const img = document.getElementById('img-viewer-img');
-  img.src = src;
-  img.style.transform = 'translate(0px,0px) scale(1)';
+// ── IMAGE VIEWER ─────────────────────────────────────
+let _vs=1,_vd0=0,_vs0=1,_vx=0,_vy=0,_vlx=0,_vly=0,_vdrag=false;
+function openViewer(src){
+  _vs=1;_vx=0;_vy=0;
+  const img=document.getElementById('img-viewer-img');
+  img.src=src; img.style.transform='translate(0px,0px) scale(1)';
   document.getElementById('img-viewer').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
-function closeViewer() {
+function closeViewer(){
   document.getElementById('img-viewer').classList.remove('open');
-  document.body.style.overflow = '';
+  document.body.style.overflow='';
 }
-function _vu() {
-  document.getElementById('img-viewer-img').style.transform = `translate(${_vx}px,${_vy}px) scale(${_vs})`;
-}
-
-(function() {
-  function getViewer() { return document.getElementById('img-viewer'); }
-  function onTS(e) {
-    if (!getViewer().classList.contains('open')) return;
-    const t = e.target;
-    if (t.id === 'img-viewer-close') { e.preventDefault(); closeViewer(); return; }
-    if (t.id === 'img-viewer') { closeViewer(); return; }
-    e.preventDefault(); e.stopPropagation();
-    if (e.touches.length === 2) {
-      _vd0 = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-      _vs0 = _vs;
-    } else if (e.touches.length === 1) {
-      _vdrag = true; _vlx = e.touches[0].clientX; _vly = e.touches[0].clientY;
-    }
+function _vu(){document.getElementById('img-viewer-img').style.transform=`translate(${_vx}px,${_vy}px) scale(${_vs})`;}
+(function(){
+  function gv(){return document.getElementById('img-viewer');}
+  function onTS(e){
+    if(!gv().classList.contains('open')) return;
+    const t=e.target;
+    if(t.id==='img-viewer-close'){e.preventDefault();closeViewer();return;}
+    if(t.id==='img-viewer'){closeViewer();return;}
+    e.preventDefault();e.stopPropagation();
+    if(e.touches.length===2){_vd0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);_vs0=_vs;}
+    else if(e.touches.length===1){_vdrag=true;_vlx=e.touches[0].clientX;_vly=e.touches[0].clientY;}
   }
-  function onTM(e) {
-    if (!getViewer().classList.contains('open')) return;
-    e.preventDefault(); e.stopPropagation();
-    if (e.touches.length === 2) {
-      const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-      _vs = Math.min(5, Math.max(1, _vs0 * (d / _vd0)));
-      _vu();
-    } else if (e.touches.length === 1 && _vdrag) {
-      _vx += e.touches[0].clientX - _vlx; _vy += e.touches[0].clientY - _vly;
-      _vlx = e.touches[0].clientX; _vly = e.touches[0].clientY;
-      _vu();
-    }
+  function onTM(e){
+    if(!gv().classList.contains('open')) return;
+    e.preventDefault();e.stopPropagation();
+    if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);_vs=Math.min(5,Math.max(1,_vs0*(d/_vd0)));_vu();}
+    else if(e.touches.length===1&&_vdrag){_vx+=e.touches[0].clientX-_vlx;_vy+=e.touches[0].clientY-_vly;_vlx=e.touches[0].clientX;_vly=e.touches[0].clientY;_vu();}
   }
-  function onTE(e) {
-    if (!getViewer().classList.contains('open')) return;
-    _vdrag = false;
-    if (e.touches.length === 0 && _vs < 1.05) { _vs=1; _vx=0; _vy=0; _vu(); }
+  function onTE(e){
+    if(!gv().classList.contains('open')) return;
+    _vdrag=false;
+    if(e.touches.length===0&&_vs<1.05){_vs=1;_vx=0;_vy=0;_vu();}
   }
-  const opts = {passive:false, capture:true};
-  document.addEventListener('touchstart', onTS, opts);
-  document.addEventListener('touchmove',  onTM, opts);
-  document.addEventListener('touchend',   onTE, {capture:true});
-  window.addEventListener('DOMContentLoaded', function() {
-    const v = getViewer();
-    v.addEventListener('touchstart', onTS, opts);
-    v.addEventListener('touchmove',  onTM, opts);
-    v.addEventListener('touchend',   onTE, {capture:true});
+  const opts={passive:false,capture:true};
+  document.addEventListener('touchstart',onTS,opts);
+  document.addEventListener('touchmove',onTM,opts);
+  document.addEventListener('touchend',onTE,{capture:true});
+  window.addEventListener('DOMContentLoaded',function(){
+    const v=gv();
+    v.addEventListener('touchstart',onTS,opts);
+    v.addEventListener('touchmove',onTM,opts);
+    v.addEventListener('touchend',onTE,{capture:true});
   });
 })();
 
-// ── LOADING ──────────────────────────────────────────
-function hideLoading() {
-  document.getElementById('loading-overlay').classList.add('hidden');
-}
-
-// ── SERVICE WORKER ───────────────────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
+function hideLoading(){document.getElementById('loading-overlay').classList.add('hidden');}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 </script>
 </body>
 </html>
