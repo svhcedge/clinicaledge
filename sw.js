@@ -1,21 +1,38 @@
-// Change this version number every time you deploy — forces cache refresh
-const CACHE = 'clinicaledge-v1775518820';
+const CACHE = 'clinicaledge-v1775520173';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './apple-touch-icon.png'
+];
 
 self.addEventListener('install', e => {
-  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
 
-// Network first — always fetch fresh, never serve stale cache
 self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  // Always network-first for sheets and apps script
+  if (url.hostname.includes('google') || url.hostname.includes('googleapis')) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // Cache-first for app assets
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    caches.match(e.request).then(cached => cached || fetch(e.request))
   );
 });
