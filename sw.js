@@ -1,4 +1,4 @@
-const CACHE = 'clinicaledge-v1775535968';
+const CACHE = 'clinicaledge-v1776049151';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
