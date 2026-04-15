@@ -198,7 +198,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <div id="tiles-section">
       <div class="tiles-label">CATEGORIES</div>
       <div id="tiles-grid"></div>
-      <div class="home-feedback">For feedback, questions or concerns, email us at svhcedge@gmail.com</div>
+      <div class="home-feedback">For feedback, questions or concerns, email us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1764617f747273707257707a767e7b3974787a">[email&#160;protected]</a></div>
     </div>
   </div>
 </div>
@@ -231,7 +231,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     </div>
   </div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var SHEET_ID='1gzTGUuVuUoW4MLApbZOkvYmSi7Z8ibbP7pWGAN3DTcg';
 var ICODE='EDGE26';
 var TSHEET='_tabs';
@@ -459,26 +459,16 @@ function rmedia(iUrl,vUrl,title,cont){
 
 function rvid(url,cont){
   var fid=gFID(url);
-  var vs=fid?'https://drive.google.com/uc?export=download&id='+fid:url;
-  var po=fid?'https://drive.google.com/thumbnail?id='+fid+'&sz=w800':'';
-  cont.style.cssText='margin-bottom:16px';cont.className='';
-  var wrap=document.createElement('div');wrap.className='vid-player-wrap';
-  var vid=document.createElement('video');vid.src=vs;vid.preload='metadata';vid.playsInline=true;vid.controls=false;if(po)vid.poster=po;
-  var ovl=document.createElement('div');ovl.className='vid-overlay';
-  ovl.innerHTML='<div class="vid-play-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>';
-  var ctrl=document.createElement('div');ctrl.className='vid-controls';
-  ctrl.innerHTML='<button class="vid-btn" id="vpb">&#9654;</button><div class="vid-progress" id="vpp"><div class="vid-progress-bar" id="vpbar"></div></div><span class="vid-time" id="vpt">0:00 / 0:00</span>';
-  wrap.appendChild(vid);wrap.appendChild(ovl);wrap.appendChild(ctrl);cont.innerHTML='';cont.appendChild(wrap);
-  var pb=ctrl.querySelector('#vpb'),pp=ctrl.querySelector('#vpp'),bar=ctrl.querySelector('#vpbar'),tm=ctrl.querySelector('#vpt');
-  function fmt(s){var m=Math.floor(s/60),sc=Math.floor(s%60);return m+':'+(sc<10?'0':'')+sc;}
-  function upd(){bar.style.width=(vid.duration?(vid.currentTime/vid.duration*100):0)+'%';tm.textContent=fmt(vid.currentTime)+' / '+fmt(vid.duration||0);}
-  function tog(){if(vid.paused)vid.play();else vid.pause();}
-  vid.addEventListener('play',function(){pb.innerHTML='&#9646;&#9646;';ovl.classList.add('hidden');});
-  vid.addEventListener('pause',function(){pb.innerHTML='&#9654;';ovl.classList.remove('hidden');});
-  vid.addEventListener('ended',function(){pb.innerHTML='&#9654;';ovl.classList.remove('hidden');vid.currentTime=0;});
-  vid.addEventListener('timeupdate',upd);vid.addEventListener('loadedmetadata',upd);
-  ovl.addEventListener('click',tog);pb.addEventListener('click',tog);
-  pp.addEventListener('click',function(e){if(!vid.duration)return;var r=pp.getBoundingClientRect();vid.currentTime=((e.clientX-r.left)/r.width)*vid.duration;});
+  var viewUrl=fid?'https://drive.google.com/file/d/'+fid+'/preview':url;
+  var poster=fid?'https://drive.google.com/thumbnail?id='+fid+'&sz=w800':'';
+  cont.className='';
+  cont.style.cssText='margin-bottom:16px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:#000;position:relative;cursor:pointer;min-height:180px;display:flex;align-items:center;justify-content:center;';
+  var inner='';
+  if(poster)inner+='<img src="'+poster+'" style="width:100%;height:auto;display:block;opacity:0.8" onerror="this.style.display=\'none\'">';
+  inner+='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>';
+  inner+='<div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#fff;font-size:12px;background:rgba(0,0,0,0.5);padding:4px">Tap to play video</div>';
+  cont.innerHTML=inner;
+  cont.onclick=function(){window.open(viewUrl,'_blank');};
 }
 
 function gF(){try{return JSON.parse(localStorage.getItem('ce_favs')||'[]');}catch(e){return[];}}
@@ -539,7 +529,7 @@ function oST(tn,items){
   subs.forEach(function(s,idx){
     var lg=lo[s];
     var icon=lg?('<div class="tile-icon"><img src="'+lg+'" alt="'+s+'"></div>'):('<div class="tile-icon">'+IC[idx%IC.length]+'</div>');
-    html+='<div class="tile" onclick="oSL(\''+tn+'\',\''+s.replace(/'/g,"\\'")+'\'">'+icon+'<div class="tile-name">'+s+'</div><div class="tile-count">'+gr[s].length+' item'+(gr[s].length!==1?'s':'')+'</div></div>';
+    html+='<div class="tile" onclick="oSL(\''+tn+'\',\''+s.replace(/'/g,"\\'")+'\')">'+icon+'<div class="tile-name">'+s+'</div><div class="tile-count">'+gr[s].length+' item'+(gr[s].length!==1?'s':'')+'</div></div>';
   });
   html+='</div>';list.innerHTML=html;psS('screen-category');
 }
@@ -609,8 +599,7 @@ function _vu(){document.getElementById('img-viewer-img').style.transform='transl
   function onTE(e){if(!gv().classList.contains('open'))return;_vdr=false;if(e.touches.length===0&&_vs<1.05){_vs=1;_vx=0;_vy=0;_vu();}}
   var opts={passive:false,capture:true};
   document.addEventListener('touchstart',onTS,opts);document.addEventListener('touchmove',onTM,opts);document.addEventListener('touchend',onTE,{capture:true});
-  window.addEventListener('DOMContentLoaded',function(){var v=gv();v.addEventListener('touchstart',onTS,opts);v.addEventListener('touchmove',onTM,opts);v.addEventListener('touchend',onTE,{capture:true});});
-})();
+  window.addEventListener('DOMContentLoaded',function(){var v=gv();v.addEventListener('touchstart',onTS,opts);v.addEventListener('touchmove',onTM,opts);v.addEventListener('touchend',onTE,{capture:true});});})();
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 </script>
 </body>
