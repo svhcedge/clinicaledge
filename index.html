@@ -198,7 +198,7 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     <div id="tiles-section">
       <div class="tiles-label">CATEGORIES</div>
       <div id="tiles-grid"></div>
-      <div class="home-feedback">For feedback, questions or concerns, email us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1764617f747273707257707a767e7b3974787a">[email&#160;protected]</a></div>
+      <div class="home-feedback">For feedback, questions or concerns, email us at svhcedge@gmail.com</div>
     </div>
   </div>
 </div>
@@ -231,10 +231,10 @@ html,body{background:var(--bg);color:var(--white);font-family:var(--font);min-he
     </div>
   </div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-var SHEET_ID='1gzTGUuVuUoW4MLApbZOkvYmSi7Z8ibbP7pWGAN3DTcg';
+<script>
+// Sheet ID removed - all data via Apps Script
 var ICODE='EDGE26';
-var TSHEET='_tabs';
+// _tabs fetched via Apps Script
 var AURL='https://script.google.com/macros/s/AKfycbyezSKI8DVaPT0VnO69gVt0kI5jJcYOrsOiY2IbQELJGZM4uBF4HLAB4xK35_B0ghBR/exec';
 var IC=['🫀','🦻','🧠','🦟','🔬','📄','💊','🩺','📊','🧬','💉','📋'];
 var aC=[],sT=[],fu=null,eV=false,cI=null,nS=[],tL={};
@@ -378,35 +378,33 @@ function ldLC(){try{return JSON.parse(localStorage.getItem('ce_logos')||'{}');}c
 
 function ldTN(){
   tL=ldLC();
-  var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(TSHEET);
-  return fetch(url).then(function(r){if(!r.ok)throw new Error('fail');return r.text();})
-    .then(function(text){
-      var rows=pCSV(text);tL={};var tabs=[];
-      for(var i=1;i<rows.length;i++){
-        var nm=cV(rows[i][0]||''),lg=rows[i][1]?cV(rows[i][1]):'';
-        if(!nm||nm.toLowerCase()==='tabs'||nm.toLowerCase()==='categories'||nm.charAt(0)==='_')continue;
+  return fetch(AURL+'?action=getTabs')
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(!j.ok||!j.tabs)throw new Error('fail');
+      tL={};var tabs=[];
+      j.tabs.forEach(function(row){
+        var nm=row.name,lg=row.logo;
+        if(!nm||nm.toLowerCase()==='tabs'||nm.toLowerCase()==='categories'||nm.charAt(0)==='_')return;
         tabs.push(nm);if(lg)tL[nm]=dURL(lg);
-      }
+      });
       svLC(tL);return tabs;
     }).catch(function(){return Object.keys(tL).length?Object.keys(tL):[];});
 }
 
 function ldTC(tn){
-  var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(tn);
-  return fetch(url).then(function(r){if(!r.ok)return[];return r.text();})
-    .then(function(text){
-      var rows=pCSV(text);if(rows.length<2)return[];
-      var hdr=rows[0].map(function(h){return cV(h).toLowerCase().trim();});
-      function ci(n){return hdr.indexOf(n);}
-      var ti=ci('title')>=0?ci('title'):0,bi=ci('body_text'),ii=ci('image_url'),vi=ci('video_url');
-      var gi=ci('tags'),ei=ci('explanation_images'),evi=ci('explanation_videos'),qi=ci('question'),si=ci('subcategory'),li=ci('subcategory_logo');
-      return rows.slice(1).map(function(cols,idx){
-        function v(i){return(i>=0&&cols[i]!=null)?cV(cols[i]):'';}
-        var title=v(ti);if(!title)return null;
-        var eI=v(ei)?v(ei).split(',').map(function(u){return u.trim();}).filter(Boolean):[];
-        var eV2=v(evi)?v(evi).split(',').map(function(u){return u.trim();}).filter(Boolean):[];
-        return{id:tn+'__'+idx,category:tn,title:title,body:v(bi),imageUrl:v(ii),videoUrl:v(vi),tags:v(gi),expImages:eI,expVideos:eV2,question:v(qi),subcategory:v(si),subcategoryLogo:v(li)};
-      }).filter(Boolean);
+  return fetch(AURL+'?action=getTab&tab='+encodeURIComponent(tn))
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(!j.ok||!j.rows)return[];
+      return j.rows.map(function(row,idx){
+        var expImages=row.explanation_images?row.explanation_images.split(',').map(function(u){return u.trim();}).filter(Boolean):[];
+        var expVideos=row.explanation_videos?row.explanation_videos.split(',').map(function(u){return u.trim();}).filter(Boolean):[];
+        return{id:tn+'__'+idx,category:tn,title:row.title||'',body:row.body_text||'',
+               imageUrl:row.image_url||'',videoUrl:row.video_url||'',tags:row.tags||'',
+               expImages:expImages,expVideos:expVideos,question:row.question||'',
+               subcategory:row.subcategory||'',subcategoryLogo:row.subcategory_logo||''};
+      }).filter(function(r){return r.title;});
     }).catch(function(){return[];});
 }
 
