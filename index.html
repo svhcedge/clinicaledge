@@ -369,6 +369,14 @@ function upG(){
 function handleRefresh(){
   var btn=document.getElementById('refresh-btn');
   if(btn){btn.style.animation='spin .6s linear';setTimeout(function(){btn.style.animation='';},700);}
+  // Force service worker update silently — no reinstall needed by user
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(reg){
+        reg.update(); // checks for new sw.js and installs if different
+      });
+    });
+  }
   ldC().then(function(){rT();}).catch(function(){});
   var u=gU();if(u)chB(u.email);
 }
@@ -598,7 +606,16 @@ function _vu(){document.getElementById('img-viewer-img').style.transform='transl
   var opts={passive:false,capture:true};
   document.addEventListener('touchstart',onTS,opts);document.addEventListener('touchmove',onTM,opts);document.addEventListener('touchend',onTE,{capture:true});
   window.addEventListener('DOMContentLoaded',function(){var v=gv();v.addEventListener('touchstart',onTS,opts);v.addEventListener('touchmove',onTM,opts);v.addEventListener('touchend',onTE,{capture:true});});})();
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      // Listen for new SW telling us to reload
+      navigator.serviceWorker.addEventListener('message',function(e){
+        if(e.data && e.data.type==='RELOAD') window.location.reload();
+      });
+    }).catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
