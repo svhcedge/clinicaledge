@@ -613,6 +613,12 @@ if('serviceWorker' in navigator){
       navigator.serviceWorker.addEventListener('message',function(e){
         if(e.data && e.data.type==='RELOAD') window.location.reload();
       });
+      // Check for SW updates every time app becomes visible
+      document.addEventListener('visibilitychange',function(){
+        if(document.visibilityState==='visible') reg.update();
+      });
+      // Also check on focus
+      window.addEventListener('focus', function(){ reg.update(); });
     }).catch(function(){});
   });
 }

@@ -1,4 +1,4 @@
-const CACHE = 'clinicaledge-v1782416080';
+const CACHE = 'clinicaledge-v1782416958';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
